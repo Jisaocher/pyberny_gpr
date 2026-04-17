@@ -1,0 +1,127 @@
+# PyBerny-GPR 混合优化默认配置
+
+# 分子设置
+molecule:
+  smiles: "CCO"           # 乙醇 SMILES
+  seed: 24                 # 随机种子
+  perturb: 0    # 初始扰动强度 (Å)，0 用于快速收敛
+
+# 计算方法
+calculation:
+  basis: "cc-pvdz"         # 基组
+  method: "RHF"            # 量子化学方法
+  unit: "angstrom"         # 坐标单位
+
+# 优化器通用设置
+optimizer:
+  max_iterations: 300      # 最大迭代次数（增加以允许充分收敛）
+  convergence_threshold: 1.0e-4  # 梯度收敛阈值（实际可达成）
+  verbose: true            # 是否输出详细信息
+
+# L-BFGS 设置
+lbfgs:
+  maxiter: 500             # L-BFGS 最大迭代
+  gtol: 1.0e-4             # 投影梯度范数阈值（‖E‖ < gtol 时收敛）
+  ftol: 1e-10              # 能量变化阈值（factr 参数）
+  memory: 10               # L-BFGS 记忆步数
+
+# PyBerny 基准方法设置（完整 BFGS，一次性运行）
+berny:
+  maxsteps: 500            # 最大优化步数
+  trust: 0.3               # 初始信任半径 (Å)
+  energy_threshold: 1e-6   # 能量收敛阈值 (Hartree)
+  gradient_threshold: 1e-4 # 梯度收敛阈值 (Hartree/Å)
+  displacement_threshold: 1e-3  # 位移收敛阈值 (Å)
+  debug: false             # 调试模式
+
+# GPR 设置
+gpr:
+  n_init: 5                # 初始采样点数（减少以加快训练）
+  type: "gradient_predicting"  # AI 方法类型（唯一推荐）：
+                               #   - gradient_predicting: 梯度预测 GPR（直接预测梯度，向梯度下降方向预测）
+  local_radius: 0.1        # 局部搜索半径 (Å)（0.2→0.1，更小范围）
+  kernel_type: "matern52"  # 核函数类型（仅 GPR 使用）
+  noise_variance: 1.0e-4   # 噪声方差（旧版：1e-4，更精确拟合）
+  xi: 0.1                  # EI 采集函数探索参数（梯度预测用）
+  lambda_grad: 0.1         # 梯度惩罚权重
+  max_training_points: 30  # 最大训练点数（滑动窗口）
+  use_gpr: true            # 是否使用 GPR（设为 false 则纯 L-BFGS）
+
+# AI 训练数据配置（gradient_predicting 方法专用）
+ai_training:
+  i_best_steps: 5          # 使用历史梯度最优的 i 个点
+  j_recent_steps: 10       # 使用最新 j 个点（如果本轮 L-BFGS 步数<j，往回找之前的数据）
+
+# AI 预测配置
+ai_prediction:
+  max_displacement: 0.3    # 最大位移限制 (Å)，防止预测点偏离太远
+  min_displacement: 0.001   # 最小位移 (Å)，避免预测点不变
+
+# 最优点选择权重（用于 L-BFGS+AI 混合策略）
+# 每轮从所有点中选择最优时，综合考虑能量和梯度
+# score = energy_weight * E_normalized + gradient_weight * ||g||_normalized
+selection_weights:
+  energy_weight: 0.3       # 能量权重（0-1 之间）
+  gradient_weight: 0.7     # 梯度权重（0-1 之间）
+                           # 推荐：gradient_weight > energy_weight
+                           # 因为分子几何优化的目标是梯度为零
+
+# 随机森林参数（已移除，不再使用）
+# random_forest:
+#   n_estimators: 100
+#   max_depth: 10
+#   min_samples_split: 2
+#   min_samples_leaf: 1
+
+# 混合策略设置（新版：外层 + 内层）
+hybrid:
+  # 内外层步数
+  outer_steps: 10           # 外层 L-BFGS 步数（真实计算，收集训练数据）
+  inner_steps: 3            # 内层探索步数（GPR 预测梯度，梯度下降法）
+
+  # 内层优化配置（自研梯度下降法）
+  inner_opt:
+    gtol: 1.0e-4            # 梯度收敛阈值（|g| < gtol 则认为收敛）
+    base_step_size: 0.05    # 基础步长（原子单位，约 0.5 pm）
+    max_step_size: 0.1      # 最大步长限制
+    min_step_size: 1.0e-4   # 最小步长限制
+    adaptive_step: true     # 是否启用自适应步长
+    disp: false             # 是否打印收敛信息（false=静默模式）
+
+  # GPR 训练数据管理
+  max_outer_iterations: 10  # 只保留最近 15 次外层迭代的真实 SCF 数据用于训练
+
+  # 验证策略
+  validate_every: 0         # 验证频率
+                            #   0 = 仅对内层最后一次迭代计算真实值（默认，最节省）
+                            #   >0 = 每 N 步验证一次（更稳健，但计算开销增加）
+  prediction_error_threshold: 1.0e-3  # 预测误差阈值（仅当 validate_every>0 时使用）
+                            #   如果 |E_pred - E_true| > 阈值，提前退出内层探索
+
+  # 择优策略
+  selection_metric: "gradient"  # 选择标准：gradient(梯度最小)/energy(能量最低)
+                               # 分子几何优化应该用 gradient，目标是找到梯度为零的点
+  verify_local_minimum: false   # 验证局部极小值（关闭以加快训练）
+  verify_extra_steps: 3         # 确认极小值额外步数
+
+  # 收敛判定参数
+  convergence:
+    threshold: 1.0e-4        # 梯度收敛阈值（与 optimizer.convergence_threshold 一致）
+    max_rounds: 50           # 最大优化轮数
+    max_no_improvement: 50   # 连续多少轮无显著改进则早停
+    no_improvement_threshold: 1.0e-6  # 梯度改进阈值（小于此值认为无改进）
+
+# 输出设置
+output:
+  save_dir: "./output"     # 输出目录
+  save_trajectory: true    # 保存轨迹
+  save_details: true       # 保存详细信息（梯度矩阵、位移等）
+  format: "json"           # 输出格式：json/csv/npy
+  plot_interval: 1         # 绘图间隔（每几步保存一次图）
+
+# 可视化设置
+visualization:
+  font_size: 14            # 图表字体大小
+  figure_size: [12, 8]     # 图表尺寸
+  dpi: 300                 # 图片分辨率
+  show_3d_structure: true  # 显示 3D 分子结构

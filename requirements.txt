@@ -1,0 +1,10 @@
+pyscf>=2.0.0
+rdkit>=2022.0.0
+scipy>=1.8.0
+scikit-learn>=1.0.0
+matplotlib>=3.5.0
+numpy>=1.20.0
+pyyaml>=6.0
+ase>=3.22.0
+zhplot>=0.1.0
+py3Dmol>=2.0.0  # 交互式 3D 分子可视化
