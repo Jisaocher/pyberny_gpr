@@ -23,7 +23,7 @@ class OptimizationPlotter:
     """
 
     def __init__(self, font_size: int = 14, figure_size: Tuple[int, int] = (12, 8),
-                 dpi: int = 300, ai_method: str = None):
+                 dpi: int = 300, ai_method: str = None, hybrid_mode: bool = False):
         """
         初始化绘图器
 
@@ -32,12 +32,14 @@ class OptimizationPlotter:
             figure_size: 图形尺寸
             dpi: 分辨率
             ai_method: AI 方法类型（'simple'/'gradient'/'random_forest'等）
+            hybrid_mode: 混合策略模式，如果 True 则只绘制外层迭代数据（stage='outer'）
         """
         self.font_size = font_size
         self.figure_size = figure_size
         self.dpi = dpi
         self.ai_method = ai_method
         self.ai_suffix = self._get_ai_suffix()
+        self.hybrid_mode = hybrid_mode  # 混合策略模式：只绘制外层数据
 
         # 设置全局字体
         plt.rcParams['font.size'] = font_size
@@ -46,6 +48,33 @@ class OptimizationPlotter:
         plt.rcParams['xtick.labelsize'] = font_size
         plt.rcParams['ytick.labelsize'] = font_size
         plt.rcParams['legend.fontsize'] = font_size
+
+    def _filter_outer_iterations(self, history: OptimizationHistory) -> OptimizationHistory:
+        """
+        过滤混合策略的历史数据，只保留外层迭代（stage='outer' 或 stage='pyberny'）
+
+        Args:
+            history: 优化历史
+
+        Returns:
+            OptimizationHistory: 过滤后的历史
+        """
+        if not self.hybrid_mode:
+            return history
+
+        # 创建新的历史记录，只保留外层数据
+        filtered_history = OptimizationHistory()
+        filtered_history.start_time = history.start_time
+        filtered_history.end_time = history.end_time
+        filtered_history.converged = history.converged
+        filtered_history.convergence_iteration = history.convergence_iteration
+
+        for it in history.iterations:
+            # 只保留外层迭代（stage='outer' 或 stage='pyberny'）
+            if it.stage in ['outer', 'pyberny']:
+                filtered_history.add_iteration(it)
+
+        return filtered_history
     
     def _get_ai_suffix(self) -> str:
         """获取 AI 方法的简短后缀"""
@@ -64,19 +93,22 @@ class OptimizationPlotter:
                             y_label: str = "Energy (Hartree)") -> plt.Figure:
         """
         绘制能量历史曲线
-        
+
         Args:
             history: 优化历史
             title: 标题
             save_path: 保存路径
             show: 是否显示
             y_label: Y 轴标签
-        
+
         Returns:
             fig: 图形对象
         """
+        # 混合策略模式：只保留外层迭代数据
+        history = self._filter_outer_iterations(history)
+
         fig, ax = plt.subplots(figsize=self.figure_size, dpi=self.dpi)
-        
+
         energies = history.get_energies()
         iterations = np.arange(len(energies))
         
@@ -111,17 +143,20 @@ class OptimizationPlotter:
                               log_scale: bool = True) -> plt.Figure:
         """
         绘制梯度范数历史曲线
-        
+
         Args:
             history: 优化历史
             title: 标题
             save_path: 保存路径
             show: 是否显示
             log_scale: 是否使用对数坐标
-        
+
         Returns:
             fig: 图形对象
         """
+        # 混合策略模式：只保留外层迭代数据
+        history = self._filter_outer_iterations(history)
+
         fig, ax = plt.subplots(figsize=self.figure_size, dpi=self.dpi)
         
         grad_norms = history.get_gradient_norms()
@@ -160,16 +195,19 @@ class OptimizationPlotter:
                               show: bool = False) -> plt.Figure:
         """
         绘制能量和梯度的组合图表
-        
+
         Args:
             history: 优化历史
             title: 标题
             save_path: 保存路径
             show: 是否显示
-        
+
         Returns:
             fig: 图形对象
         """
+        # 混合策略模式：只保留外层迭代数据
+        history = self._filter_outer_iterations(history)
+
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=self.figure_size, dpi=self.dpi)
         fig.suptitle(title, fontsize=self.font_size + 2, y=1.02)
         
@@ -214,27 +252,30 @@ class OptimizationPlotter:
                         plot_type: str = 'both') -> plt.Figure:
         """
         绘制多个优化历史的对比图
-        
+
         Args:
             histories: 优化历史字典 {method_name: history}
             title: 标题
             save_path: 保存路径
             show: 是否显示
             plot_type: 'energy', 'gradient', 或 'both'
-        
+
         Returns:
             fig: 图形对象
         """
         colors = plt.cm.tab10(np.linspace(0, 1, len(histories)))
-        
+
         if plot_type == 'both':
             fig, (ax1, ax2) = plt.subplots(2, 1, figsize=self.figure_size, dpi=self.dpi)
             fig.suptitle(title, fontsize=self.font_size + 2, y=1.02)
         else:
             fig, ax = plt.subplots(figsize=self.figure_size, dpi=self.dpi)
             ax.set_title(title, fontsize=self.font_size, pad=15)
-        
+
         for idx, (name, history) in enumerate(histories.items()):
+            # 混合策略模式：只保留外层迭代数据
+            history = self._filter_outer_iterations(history)
+            
             energies = history.get_energies()
             grad_norms = history.get_gradient_norms()
             iterations = np.arange(len(energies))
@@ -290,16 +331,19 @@ class OptimizationPlotter:
                                   show: bool = False) -> plt.Figure:
         """
         绘制位移历史曲线
-        
+
         Args:
             history: 优化历史
             title: 标题
             save_path: 保存路径
             show: 是否显示
-        
+
         Returns:
             fig: 图形对象
         """
+        # 混合策略模式：只保留外层迭代数据
+        history = self._filter_outer_iterations(history)
+
         fig, ax = plt.subplots(figsize=self.figure_size, dpi=self.dpi)
         
         displacements = history.get_displacements()

@@ -92,7 +92,7 @@ python run_comparison.py --smiles CCO --perturb 0.1
 | `--molecule` | 分子名称 | `ethanol` |
 | `--smiles` | SMILES 字符串 | `None` |
 | `--perturb` | 初始扰动 (Å) | `0.0` |
-| `--seed` | 随机种子 | `42` |
+| `--seed` | 随机种子 | `24` |
 | `--max-iter` | 最大迭代次数 | `300` |
 | `--threshold` | 收敛阈值 | `5e-4` |
 
@@ -114,7 +114,7 @@ python run_comparison.py --smiles CCO --perturb 0.1
 ```yaml
 molecule:
   smiles: "CCO"
-  seed: 42
+  seed: 24
   perturb: 0.1
 ```
 
@@ -210,7 +210,7 @@ from optimizers.hybrid import HybridOptimizer
 import yaml
 
 # 1. 创建分子
-mol = Molecule.from_smiles("CCO", seed=42, perturb_strength=0.1)
+mol = Molecule.from_smiles("CCO", seed=24, perturb_strength=0.1)
 
 # 2. 加载配置
 with open("config/default_config.yaml") as f:

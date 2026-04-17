@@ -44,13 +44,8 @@ gpr:
   noise_variance: 1.0e-4   # 噪声方差（旧版：1e-4，更精确拟合）
   xi: 0.1                  # EI 采集函数探索参数（梯度预测用）
   lambda_grad: 0.1         # 梯度惩罚权重
-  max_training_points: 30  # 最大训练点数（滑动窗口）
+  max_training_points: 10  # 最大训练点数（滑动窗口）
   use_gpr: true            # 是否使用 GPR（设为 false 则纯 L-BFGS）
-
-# AI 训练数据配置（gradient_predicting 方法专用）
-ai_training:
-  i_best_steps: 5          # 使用历史梯度最优的 i 个点
-  j_recent_steps: 10       # 使用最新 j 个点（如果本轮 L-BFGS 步数<j，往回找之前的数据）
 
 # AI 预测配置
 ai_prediction:
@@ -77,19 +72,23 @@ selection_weights:
 hybrid:
   # 内外层步数
   outer_steps: 10           # 外层 L-BFGS 步数（真实计算，收集训练数据）
-  inner_steps: 3            # 内层探索步数（GPR 预测梯度，梯度下降法）
+  inner_steps: 5            # 内层探索步数（GPR 预测梯度，梯度下降法）
 
   # 内层优化配置（自研梯度下降法）
   inner_opt:
     gtol: 1.0e-4            # 梯度收敛阈值（|g| < gtol 则认为收敛）
     base_step_size: 0.05    # 基础步长（原子单位，约 0.5 pm）
     max_step_size: 0.1      # 最大步长限制
-    min_step_size: 1.0e-4   # 最小步长限制
+    min_step_size: 1.0e-4     # 最小步长限制
     adaptive_step: true     # 是否启用自适应步长
+    adaptive_factor: 100.0   # 自适应步长系数：step = base_step * (0.1 + g_norm * adaptive_factor)
+                            # 梯度越大步长越大，适合初期快速探索；梯度小则步长自动缩小
     disp: false             # 是否打印收敛信息（false=静默模式）
 
-  # GPR 训练数据管理
-  max_outer_iterations: 10  # 只保留最近 15 次外层迭代的真实 SCF 数据用于训练
+  # GPR 训练数据管理（两级筛选）
+  # 第一级：时间窗口 - 只保留最近 max_outer_iterations 次外层迭代的数据
+  # 第二级：数量上限 - 在窗口内按梯度范数排序，最多保留 max_training_points 个点
+  max_outer_iterations: 15  # 时间窗口大小
 
   # 验证策略
   validate_every: 0         # 验证频率

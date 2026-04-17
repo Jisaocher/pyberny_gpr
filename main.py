@@ -134,11 +134,16 @@ def run_optimization(method: str, molecule: Molecule, config: Dict[str, Any],
 
     # 生成图表
     vis_config = config.get('visualization', {})
+    
+    # 混合策略模式：只绘制外层迭代数据（内层数据没有实际 PySCF 计算）
+    is_hybrid = (method == 'hybrid')
+    
     plotter = OptimizationPlotter(
         font_size=vis_config.get('font_size', 14),
         figure_size=tuple(vis_config.get('figure_size', [12, 8])),
         dpi=vis_config.get('dpi', 300),
-        ai_method=ai_method
+        ai_method=ai_method,
+        hybrid_mode=is_hybrid  # 混合策略启用外层数据过滤
     )
 
     plots_dir = os.path.join(output_manager.method_dir, 'plots')
@@ -179,8 +184,8 @@ def main():
                        help='SMILES 字符串（覆盖 --molecule）')
     parser.add_argument('--perturb', type=float, default=0.0,
                        help='初始扰动强度 (Å) (default: 0.0)')
-    parser.add_argument('--seed', type=int, default=42,
-                       help='随机种子 (default: 42)')
+    parser.add_argument('--seed', type=int, default=24,
+                       help='随机种子 (default: 24)')
     parser.add_argument('--config', type=str, default=None,
                        help='配置文件路径')
     parser.add_argument('--output', type=str, default=None,
@@ -218,7 +223,7 @@ def main():
     if args.smiles:
         config['molecule']['smiles'] = args.smiles
 
-    if args.seed != 42:
+    if args.seed != 24:
         config['molecule']['seed'] = args.seed
 
     if args.perturb != 0.0:

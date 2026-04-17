@@ -48,7 +48,7 @@ class Molecule:
         return np.array([mass_dict.get(sym, 12.0) for sym in self.atom_symbols])
     
     @classmethod
-    def from_smiles(cls, smiles: str, seed: int = 42, 
+    def from_smiles(cls, smiles: str, seed: int = 24, 
                     perturb_strength: float = 0.0) -> 'Molecule':
         """
         从 SMILES 字符串生成分子

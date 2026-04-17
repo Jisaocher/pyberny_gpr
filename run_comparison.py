@@ -36,7 +36,7 @@ def load_config(config_path: str = None) -> Dict[str, Any]:
     return config
 
 
-def run_comparison(smiles: str = 'CCO', perturb: float = 0.0, seed: int = 42,
+def run_comparison(smiles: str = 'CCO', perturb: float = 0.0, seed: int = 24,
                    config: Dict[str, Any] = None,
                    output_dir: str = None) -> Dict[str, Any]:
     """
@@ -135,10 +135,12 @@ def run_comparison(smiles: str = 'CCO', perturb: float = 0.0, seed: int = 42,
     print("生成对比图表")
     print(f"{'='*70}")
 
+    # 混合策略模式：只绘制外层迭代数据（内层数据没有实际 PySCF 计算）
     plotter = OptimizationPlotter(
         font_size=config.get('visualization', {}).get('font_size', 14),
         figure_size=tuple(config.get('visualization', {}).get('figure_size', [12, 8])),
-        dpi=config.get('visualization', {}).get('dpi', 300)
+        dpi=config.get('visualization', {}).get('dpi', 300),
+        hybrid_mode=True  # 混合策略启用外层数据过滤
     )
 
     plots_dir = os.path.join(output_dir, 'plots')
@@ -191,8 +193,8 @@ def main():
                        help='分子 SMILES (default: CCO)')
     parser.add_argument('--perturb', type=float, default=0.0,
                        help='初始扰动强度 (Å) (default: 0.0)')
-    parser.add_argument('--seed', type=int, default=42,
-                       help='随机种子 (default: 42)')
+    parser.add_argument('--seed', type=int, default=24,
+                       help='随机种子 (default: 24)')
     parser.add_argument('--output', type=str, default=None,
                        help='输出目录')
     parser.add_argument('--config', type=str, default=None,
@@ -208,7 +210,7 @@ def main():
             config['molecule'] = {}
         config['molecule']['perturb'] = args.perturb
 
-    if args.seed != 42:
+    if args.seed != 24:
         if 'molecule' not in config:
             config['molecule'] = {}
         config['molecule']['seed'] = args.seed
@@ -216,7 +218,7 @@ def main():
     run_comparison(
         smiles=args.smiles,
         perturb=config.get('molecule', {}).get('perturb', 0.0),
-        seed=config.get('molecule', {}).get('seed', 42),
+        seed=config.get('molecule', {}).get('seed', 24),
         config=config,
         output_dir=args.output
     )

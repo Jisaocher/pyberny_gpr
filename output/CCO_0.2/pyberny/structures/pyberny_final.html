@@ -13,8 +13,8 @@
         <body>
             <h1>pyberny_final</h1>
             <div class="container">
-                <div id="3dmolviewer_17764124695809846"  style="position: relative; width: 800px; height: 600px;">
-        <p id="3dmolwarning_17764124695809846" style="background-color:#ffcccc;color:black">3Dmol.js failed to load for some reason.  Please check your browser console for error messages.<br></p>
+                <div id="3dmolviewer_17764193981608055"  style="position: relative; width: 800px; height: 600px;">
+        <p id="3dmolwarning_17764193981608055" style="background-color:#ffcccc;color:black">3Dmol.js failed to load for some reason.  Please check your browser console for error messages.<br></p>
         </div>
 <script>
 
@@ -45,18 +45,18 @@ $3Dmolpromise = null;
   $3Dmolpromise = loadScriptAsync('https://cdn.jsdelivr.net/npm/3dmol@2.5.4/build/3Dmol-min.js');
 }
 
-var viewer_17764124695809846 = null;
-var warn = document.getElementById("3dmolwarning_17764124695809846");
+var viewer_17764193981608055 = null;
+var warn = document.getElementById("3dmolwarning_17764193981608055");
 if(warn) {
     warn.parentNode.removeChild(warn);
 }
 $3Dmolpromise.then(function() {
-viewer_17764124695809846 = $3Dmol.createViewer(document.getElementById("3dmolviewer_17764124695809846"),{backgroundColor:"white"});
-viewer_17764124695809846.zoomTo();
-	viewer_17764124695809846.addModel("9\nmolecule_CCO_best_pyberny\nC     -0.833392     0.307803    -0.095650\nC      0.434052    -0.361924     0.406520\nO      1.578242     0.420506     0.195164\nH     -1.711111    -0.303845     0.128154\nH     -0.796897     0.454142    -1.179809\nH     -0.960186     1.285425     0.373444\nH      0.373447    -0.518225     1.483608\nH      0.547252    -1.349861    -0.055458\nH      1.703179     0.541005    -0.734389","xyz");
-	viewer_17764124695809846.setStyle({"sphere": {"scale": 0.3}, "stick": {"radius": 0.15}});
-	viewer_17764124695809846.zoomTo();
-viewer_17764124695809846.render();
+viewer_17764193981608055 = $3Dmol.createViewer(document.getElementById("3dmolviewer_17764193981608055"),{backgroundColor:"white"});
+viewer_17764193981608055.zoomTo();
+	viewer_17764193981608055.addModel("9\nmolecule_CCO_best_pyberny\nC     -0.833392     0.307803    -0.095650\nC      0.434052    -0.361924     0.406520\nO      1.578242     0.420506     0.195164\nH     -1.711111    -0.303845     0.128154\nH     -0.796897     0.454142    -1.179809\nH     -0.960186     1.285425     0.373444\nH      0.373447    -0.518225     1.483608\nH      0.547252    -1.349861    -0.055458\nH      1.703179     0.541005    -0.734389","xyz");
+	viewer_17764193981608055.setStyle({"sphere": {"scale": 0.3}, "stick": {"radius": 0.15}});
+	viewer_17764193981608055.zoomTo();
+viewer_17764193981608055.render();
 });
 </script>
             </div>

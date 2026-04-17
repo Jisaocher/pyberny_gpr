@@ -169,7 +169,7 @@ python run_comparison.py --smiles CCO --perturb 0.1
 | `--molecule` | 分子名称 | `ethanol` |
 | `--smiles` | SMILES 字符串 | `None` |
 | `--perturb` | 初始扰动强度 (Å) | `0.0` |
-| `--seed` | 随机种子 | `42` |
+| `--seed` | 随机种子 | `24` |
 | `--max-iter` | 最大迭代次数 | `300` |
 | `--threshold` | 收敛阈值 | `5e-4` |
 

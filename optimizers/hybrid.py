@@ -57,6 +57,7 @@ class HybridOptimizer(BaseOptimizer):
         self.max_step_size = inner_opt_config.get('max_step_size', 0.1)
         self.min_step_size = inner_opt_config.get('min_step_size', 1e-4)
         self.adaptive_step = inner_opt_config.get('adaptive_step', True)
+        self.adaptive_factor = inner_opt_config.get('adaptive_factor', 20.0)  # 自适应步长系数
         self.inner_disp = inner_opt_config.get('disp', False)
 
         # 验证策略
@@ -133,7 +134,7 @@ class HybridOptimizer(BaseOptimizer):
         # 打印开始信息
         if self.config.get('optimizer', {}).get('verbose', True):
             print("=" * 70)
-            print("L-BFGS-GPR 混合优化开始（新版策略，PyBerny 外层）")
+            print("PyBerny-GPR 混合优化开始")
             print("=" * 70)
             print(f"外层步数：{self.outer_steps}")
             print(f"内层步数：{self.inner_steps}")
@@ -368,12 +369,11 @@ class HybridOptimizer(BaseOptimizer):
             dict: {coords, energy, gradient, history}
         """
         if self.config.get('optimizer', {}).get('verbose', True):
-            print(f"\n[外层 PyBerny L-BFGS] 执行 {self.outer_steps} 步...")
+            print(f"\n[外层 PyBerny] 执行 {self.outer_steps} 步...")
 
         history = []
 
         # 使用 PyBerny 的 run_fixed_steps 方法执行固定步数的 L-BFGS 优化
-        # PyBerny 会自动保存和恢复内部 L-BFGS 状态（s, y 向量对）
         final_coords, lbfgs_history, outer_pyscf_calls = self.lbfgs_optimizer.run_fixed_steps(
             coords,
             self.outer_steps,
@@ -585,10 +585,10 @@ class HybridOptimizer(BaseOptimizer):
                 self.history.add_iteration(inner_data)
                 break
 
-            # 3. 自适应步长：梯度越大，步长越小
+            # 3. 自适应步长：梯度越大，步长越大（初期快速探索，后期精细优化）
             if self.adaptive_step:
-                # 步长与梯度范数成反比
-                adaptive_factor = 1.0 / (1.0 + g_norm)
+                # step = base_step * (1 + g_norm * adaptive_factor)
+                adaptive_factor = 1.0 * (0.1 + g_norm * self.adaptive_factor)
                 step_size = self.base_step_size * adaptive_factor
                 # 限制步长范围
                 step_size = max(self.min_step_size, min(step_size, self.max_step_size))
