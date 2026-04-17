@@ -33,11 +33,17 @@ class PyBernyOptimizer(BaseOptimizer):
         super().__init__(config)
         self.name = "PyBerny L-BFGS"
 
-        # L-BFGS 特定参数
-        lbfgs_config = config.get('lbfgs', {})
-        self.maxiter = int(lbfgs_config.get('maxiter', 100))
-        self.gtol = float(lbfgs_config.get('gtol', 1e-5))
-        self.trust = float(config.get('gpr', {}).get('local_radius', 0.5))
+        # L-BFGS 参数：直接使用 berny 配置，确保与基准方法一致
+        berny_config = config.get('berny', {})
+        
+        # 最大步数：使用 berny.maxsteps
+        self.maxiter = int(berny_config.get('maxsteps', 500))
+        
+        # 梯度阈值：使用 berny.gradient_threshold
+        self.gtol = float(berny_config.get('gradient_threshold', 1e-4))
+        
+        # 信任半径：使用 berny.trust
+        self.trust = float(berny_config.get('trust', 0.3))
 
         # 内部状态
         self._energy_func = None
@@ -215,8 +221,16 @@ class PyBernyOptimizer(BaseOptimizer):
         self._prev_coords = coords_flat.copy()
 
         # 创建几何结构和 berny 优化器（每轮都是新的实例，不继承状态）
+        # 传入与基准方法相同的收敛阈值，确保行为一致
         geom = Geometry(list(self.atom_symbols), self.current_mol.coords)
-        berny_optimizer = berny.Berny(geom, maxsteps=n_steps, trust=self.trust)
+        berny_optimizer = berny.Berny(
+            geom,
+            maxsteps=n_steps,
+            trust=self.trust,
+            energy_threshold=self.config.get('berny', {}).get('energy_threshold', 1e-6),
+            gradient_threshold=self.gtol,
+            displacement_threshold=self.config.get('berny', {}).get('displacement_threshold', 1e-3)
+        )
 
         # 执行固定步数（标准用法：for geom in optimizer）
         step = 0

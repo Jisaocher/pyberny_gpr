@@ -75,22 +75,25 @@ pyberny_gpr/
 ### 2.3 算法流程
 
 ```python
+# 融合设计：去除独立初始采样，第 1 轮外层使用 n_init + outer_steps 步
 while round_num < max_rounds:
-    # 步骤 1: 外层 PyBerny BFGS (m 步)
-    outer_result = self._run_outer_bfgs(coords)
-    
+    # 步骤 1: 外层 PyBerny BFGS
+    # 第 1 轮：n_init + outer_steps 步（融合初始采样）
+    # 后续轮：outer_steps 步
+    outer_result = self._run_outer_bfgs(coords, is_first_round=(round_num == 1))
+
     # 步骤 2: 训练 GPR 模型
     self._train_gpr()
-    
+
     # 步骤 3: 内层 GPR 探索 (n 步)
     inner_result = self._run_inner_exploration(outer_result)
-    
+
     # 步骤 4: 择优选择
     best_candidate = self._select_best_candidate(outer_result, inner_result)
-    
+
     # 步骤 5: 更新起点
     coords = best_candidate['coords']
-    
+
     # 步骤 6: 收敛检查
     if gradient_norm < threshold:
         break
@@ -158,10 +161,16 @@ calculation:
 | 参数 | 含义 | 默认值 |
 |------|------|--------|
 | `hybrid.outer_steps` | 外层 PyBerny 步数 | 10 |
-| `hybrid.inner_steps` | 内层 GPR 探索步数 | 3 |
-| `selection_weights.energy_weight` | 能量权重 | 0.3 |
-| `selection_weights.gradient_weight` | 梯度权重 | 0.7 |
-| `gpr.max_training_points` | 最大训练点数 | 30 |
+| `hybrid.inner_steps` | 内层 GPR 探索步数 | 5 |
+| `hybrid.selection_weights.energy_weight` | 能量权重 | 0.3 |
+| `hybrid.selection_weights.gradient_weight` | 梯度权重 | 0.7 |
+| `gpr.n_init` | 初始采样点数（融合到第 1 轮） | 5 |
+| `gpr.max_training_points` | 最大训练点数 | 10 |
+
+**注意**：
+- 第 1 轮外层步数 = `n_init + outer_steps` = 15 步
+- 后续轮次外层步数 = `outer_steps` = 10 步
+- 混合方法外层直接使用 `berny` 配置，确保与基准方法一致
 
 ### 5.2 核心变量
 
@@ -189,10 +198,12 @@ HybridOptimizer.optimize()
 ## 7. 总结
 
 ### 创新点
-1. 外层 + 内层分离设计
-2. 滑动窗口数据管理
-3. 梯度预测直接符合优化目标
-4. 自适应步长梯度下降
+1. **融合设计**：去除独立初始采样，第 1 轮外层使用 `n_init + outer_steps` 步
+2. **配置同步**：混合方法外层与基准方法使用完全相同的 `berny` 配置
+3. 外层 + 内层分离设计
+4. 滑动窗口数据管理
+5. 梯度预测直接符合优化目标
+6. 自适应步长梯度下降
 
 ### 适用场景
 - 分子几何优化

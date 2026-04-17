@@ -18,13 +18,6 @@ optimizer:
   convergence_threshold: 1.0e-4  # 梯度收敛阈值（实际可达成）
   verbose: true            # 是否输出详细信息
 
-# L-BFGS 设置
-lbfgs:
-  maxiter: 500             # L-BFGS 最大迭代
-  gtol: 1.0e-4             # 投影梯度范数阈值（‖E‖ < gtol 时收敛）
-  ftol: 1e-10              # 能量变化阈值（factr 参数）
-  memory: 10               # L-BFGS 记忆步数
-
 # PyBerny 基准方法设置（完整 BFGS，一次性运行）
 berny:
   maxsteps: 500            # 最大优化步数
@@ -47,10 +40,6 @@ gpr:
   max_training_points: 10  # 最大训练点数（滑动窗口）
   use_gpr: true            # 是否使用 GPR（设为 false 则纯 L-BFGS）
 
-# AI 预测配置
-ai_prediction:
-  max_displacement: 0.3    # 最大位移限制 (Å)，防止预测点偏离太远
-  min_displacement: 0.001   # 最小位移 (Å)，避免预测点不变
 
 # 最优点选择权重（用于 L-BFGS+AI 混合策略）
 # 每轮从所有点中选择最优时，综合考虑能量和梯度

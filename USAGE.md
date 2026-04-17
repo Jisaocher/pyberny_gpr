@@ -135,11 +135,17 @@ optimizer:
 ```
 
 ### 混合策略（核心）
+
 ```yaml
 hybrid:
-  outer_steps: 10            # 外层 PyBerny 步数
-  inner_steps: 3             # 内层 GPR 探索步数
-  
+  outer_steps: 10            # 外层 PyBerny 步数（第 1 轮：15 步 = n_init + outer_steps）
+  inner_steps: 5             # 内层 GPR 探索步数
+
+  # 融合设计说明：
+  # - 第 1 轮：外层使用 n_init + outer_steps 步，融合初始采样
+  # - 后续轮：外层使用 outer_steps 步
+  # - 不再需要独立的"初始采样"阶段
+
   inner_opt:
     gtol: 1.0e-4
     base_step_size: 0.05
@@ -156,13 +162,28 @@ hybrid:
 ```
 
 ### GPR 设置
+
 ```yaml
 gpr:
-  n_init: 5
-  max_training_points: 30
-  local_radius: 0.1
-  noise_variance: 1.0e-4
+  n_init: 5                  # 初始采样点数（融合到第 1 轮外层）
+  max_training_points: 10    # 滑动窗口大小
+  local_radius: 0.1          # 局部搜索半径 (Å)
+  noise_variance: 1.0e-4     # 噪声方差
 ```
+
+### PyBerny 配置（基准方法 + 混合方法外层）
+
+```yaml
+berny:
+  maxsteps: 500              # 最大步数
+  trust: 0.3                 # 信任半径 (Å)
+  energy_threshold: 1e-6     # 能量收敛阈值
+  gradient_threshold: 1e-4   # 梯度收敛阈值
+  displacement_threshold: 1e-3  # 位移收敛阈值
+  debug: false
+```
+
+**注意**：混合方法的外层优化直接使用 `berny` 配置，确保与基准方法参数一致。
 
 ---
 
@@ -244,9 +265,11 @@ print(f"最优梯度：{history.best_iteration.gradient_norm:.6f}")
 | 参数 | 含义 | 默认值 | 建议值 |
 |------|------|--------|--------|
 | `hybrid.outer_steps` | 外层步数 | 10 | 10-15 |
-| `hybrid.inner_steps` | 内层步数 | 3 | 3-5 |
+| `hybrid.inner_steps` | 内层步数 | 5 | 3-5 |
 | `gpr.n_init` | 初始采样点数 | 5 | 5-10 |
-| `gpr.max_training_points` | 最大训练点数 | 30 | 20-50 |
+| `gpr.max_training_points` | 最大训练点数 | 10 | 10-20 |
+
+**注意**：第 1 轮外层迭代使用 `n_init + outer_steps` 步（默认 15 步），后续轮次使用 `outer_steps` 步（默认 10 步）。
 
 ### 择优权重
 
@@ -264,6 +287,16 @@ print(f"最优梯度：{history.best_iteration.gradient_norm:.6f}")
 | `convergence_threshold` | 梯度收敛阈值 | 1e-4 |
 | `max_rounds` | 最大优化轮数 | 50 |
 | `max_no_improvement` | 无改进早停轮数 | 50 |
+
+### PyBerny 参数（基准方法 + 混合方法外层）
+
+| 参数 | 含义 | 默认值 |
+|------|------|--------|
+| `berny.maxsteps` | 最大步数 | 500 |
+| `berny.trust` | 信任半径 | 0.3 Å |
+| `berny.gradient_threshold` | 梯度收敛阈值 | 1e-4 |
+| `berny.energy_threshold` | 能量收敛阈值 | 1e-6 |
+| `berny.displacement_threshold` | 位移收敛阈值 | 1e-3 |
 
 ---
 

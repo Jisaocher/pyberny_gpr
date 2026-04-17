@@ -103,10 +103,11 @@ python main.py --method hybrid --molecule ethanol --perturb 0.1
 │                    PyBerny-GPR 混合优化流程                   │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
-│  初始采样 → 外层 PyBerny(m 步) → 训练 GPR → 内层 GPR 探索 (n 步)  │
-│      ↑                                           │          │
-│      └────────── 择优选择 ←────────────────────────┘          │
-│                         循环                                   │
+│  第 1 轮：外层 PyBerny(n_init + outer_steps 步) → 训练 GPR      │
+│         → 内层 GPR 探索 (inner_steps 步) → 择优               │
+│                                                             │
+│  后续轮：外层 PyBerny(outer_steps 步) → 训练 GPR → 内层探索    │
+│         → 择优 → 循环                                        │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -116,25 +117,34 @@ python main.py --method hybrid --molecule ethanol --perturb 0.1
 在 `config/default_config.yaml` 中调整：
 
 ```yaml
+# 融合设计：第 1 轮外层使用 n_init + outer_steps 步，融合初始采样
 hybrid:
-  outer_steps: 10           # 外层 PyBerny 步数（真实计算）
-  inner_steps: 3            # 内层 GPR 探索步数（预测）
-  
+  outer_steps: 10           # 外层 PyBerny 步数（第 1 轮：15 步 = 5+10）
+  inner_steps: 5            # 内层 GPR 探索步数
+
   # 择优策略
   selection_metric: "gradient"
   selection_weights:
     energy_weight: 0.3      # 能量权重
     gradient_weight: 0.7    # 梯度权重（推荐 > 能量权重）
-  
+
   # 收敛判定
   convergence:
     threshold: 1.0e-4       # 梯度收敛阈值
     max_rounds: 50          # 最大优化轮数
 
 gpr:
-  n_init: 5                 # 初始采样点数
-  max_training_points: 30   # 滑动窗口大小
+  n_init: 5                 # 初始采样点数（仅用于第 1 轮）
+  max_training_points: 10   # 滑动窗口大小
   local_radius: 0.1         # 局部搜索半径 (Å)
+
+# PyBerny 配置（混合方法外层与基准方法使用相同参数）
+berny:
+  maxsteps: 500             # 最大步数
+  trust: 0.3                # 信任半径 (Å)
+  gradient_threshold: 1e-4  # 梯度收敛阈值
+  energy_threshold: 1e-6    # 能量收敛阈值
+  displacement_threshold: 1e-3  # 位移收敛阈值
 ```
 
 ---
@@ -229,7 +239,9 @@ python draw_structure3D.py
 | 坐标系统 | **冗余内坐标** | 笛卡尔坐标 |
 | 收敛速度 | 更快 | 较慢 |
 
-**注意**：本项目使用 PyBerny (完整 BFGS)，不是 L-BFGS。
+**注意**：
+1. 本项目使用 PyBerny (完整 BFGS)，不是 L-BFGS
+2. 混合方法的外层优化与基准方法使用**完全相同的 berny 配置**，确保公平对比
 
 ---
 
