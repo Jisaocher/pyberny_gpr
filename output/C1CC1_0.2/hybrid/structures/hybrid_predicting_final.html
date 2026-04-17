@@ -13,8 +13,8 @@
         <body>
             <h1>hybrid_predicting_final</h1>
             <div class="container">
-                <div id="3dmolviewer_17764193980065243"  style="position: relative; width: 800px; height: 600px;">
-        <p id="3dmolwarning_17764193980065243" style="background-color:#ffcccc;color:black">3Dmol.js failed to load for some reason.  Please check your browser console for error messages.<br></p>
+                <div id="3dmolviewer_17764351035192683"  style="position: relative; width: 800px; height: 600px;">
+        <p id="3dmolwarning_17764351035192683" style="background-color:#ffcccc;color:black">3Dmol.js failed to load for some reason.  Please check your browser console for error messages.<br></p>
         </div>
 <script>
 
@@ -45,18 +45,18 @@ $3Dmolpromise = null;
   $3Dmolpromise = loadScriptAsync('https://cdn.jsdelivr.net/npm/3dmol@2.5.4/build/3Dmol-min.js');
 }
 
-var viewer_17764193980065243 = null;
-var warn = document.getElementById("3dmolwarning_17764193980065243");
+var viewer_17764351035192683 = null;
+var warn = document.getElementById("3dmolwarning_17764351035192683");
 if(warn) {
     warn.parentNode.removeChild(warn);
 }
 $3Dmolpromise.then(function() {
-viewer_17764193980065243 = $3Dmol.createViewer(document.getElementById("3dmolviewer_17764193980065243"),{backgroundColor:"white"});
-viewer_17764193980065243.zoomTo();
-	viewer_17764193980065243.addModel("9\nmolecule_C1CC1_best_hybrid\nC     -0.182171     0.883273    -0.051973\nC     -0.577497    -0.555436     0.103733\nC      0.872066    -0.169707     0.121769\nH     -0.371510     1.556249     0.775002\nH     -0.291587     1.338794    -1.028146\nH     -0.955115    -1.077356    -0.766668\nH     -1.035504    -0.859752     1.036491\nH      1.398951    -0.211978     1.066777\nH      1.479190    -0.429339    -0.736427","xyz");
-	viewer_17764193980065243.setStyle({"sphere": {"scale": 0.3}, "stick": {"radius": 0.15}});
-	viewer_17764193980065243.zoomTo();
-viewer_17764193980065243.render();
+viewer_17764351035192683 = $3Dmol.createViewer(document.getElementById("3dmolviewer_17764351035192683"),{backgroundColor:"white"});
+viewer_17764351035192683.zoomTo();
+	viewer_17764351035192683.addModel("9\nmolecule_C1CC1_best_hybrid\nC     -0.182171     0.883273    -0.051973\nC     -0.577497    -0.555436     0.103733\nC      0.872066    -0.169707     0.121769\nH     -0.371510     1.556249     0.775002\nH     -0.291587     1.338794    -1.028146\nH     -0.955115    -1.077356    -0.766668\nH     -1.035504    -0.859752     1.036491\nH      1.398951    -0.211978     1.066777\nH      1.479190    -0.429339    -0.736427","xyz");
+	viewer_17764351035192683.setStyle({"sphere": {"scale": 0.3}, "stick": {"radius": 0.15}});
+	viewer_17764351035192683.zoomTo();
+viewer_17764351035192683.render();
 });
 </script>
             </div>

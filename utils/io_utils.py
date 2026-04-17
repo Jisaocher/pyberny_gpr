@@ -224,8 +224,9 @@ class OutputManager:
                 # 注释行：根据方法类型生成不同格式
                 if is_hybrid:
                     # 混合策略：区分轮次和内外层
-                    round_label = f"轮次{it.round_num}" if it.round_num > 0 else "初始采样"
-                    
+                    # 第 1 轮的外层迭代也标记为"轮次 1"，不再使用"初始采样"标签
+                    round_label = f"轮次{it.round_num}"
+
                     if it.stage == 'outer':
                         # 外层：真实能量和梯度
                         comment = f"{round_label}  Outer Iteration {it.iteration}, Energy={it.energy:.10f}, |grad|={it.gradient_norm:.6f}"
@@ -234,8 +235,8 @@ class OutputManager:
                         pred_norm = it.gradient_pred_norm if it.gradient_pred_norm is not None else 0.0
                         comment = f"{round_label}  Inner Iteration {it.iteration}, |pred_grad|={pred_norm:.6f}"
                     else:
-                        # 初始采样
-                        comment = f"{round_label}  Outer Iteration {it.iteration}, Energy={it.energy:.10f}, |grad|={it.gradient_norm:.6f}"
+                        # 其他情况（pyberny）
+                        comment = f"Outer Iteration {it.iteration}, Energy={it.energy:.10f}, |grad|={it.gradient_norm:.6f}"
                 else:
                     # 纯 PyBerny：简单格式
                     comment = f"Iteration {it.iteration}, Energy={it.energy:.10f}, |grad|={it.gradient_norm:.6f}"

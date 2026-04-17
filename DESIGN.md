@@ -177,8 +177,7 @@ calculation:
 
 ```
 HybridOptimizer.optimize()
-├── _initial_sampling()          # 初始 PyBerny 采样
-├── _run_outer_bfgs()            # 外层 BFGS
+├── _run_outer_bfgs()            # 外层 BFGS（第 1 轮：n_init + outer_steps 步）
 ├── _train_gpr()                 # 训练 GPR
 ├── _run_inner_exploration()     # 内层探索
 ├── _select_best_candidate()     # 择优选择

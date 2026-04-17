@@ -1,5 +1,5 @@
 """
-L-BFGS-GPR 混合优化策略（新版）
+L-BFGS-GPR 混合优化策略（融合版）
 
 核心思想：
 - 外层：使用 PyBerny (L-BFGS) 真实计算，可靠优化 + 收集训练数据
@@ -12,6 +12,11 @@ L-BFGS-GPR 混合优化策略（新版）
   - >0: 每 N 步验证一次，预测误差超阈值则提前退出
 
 注意：外层 PyBerny 每轮独立运行，不继承之前轮次的 L-BFGS 历史状态
+
+融合设计：
+- 去除独立的初始采样阶段
+- 第 1 轮外层迭代使用 n_init + outer_steps 步，融合初始采样和外层优化
+- 轨迹输出只区分 Outer/Inner，不再展示"初始采样"标签
 """
 import numpy as np
 from typing import Dict, Any, Optional, Tuple, List
@@ -25,14 +30,14 @@ from models.energy_gradient_gpr import EnergyGradientGPR
 
 class HybridOptimizer(BaseOptimizer):
     """
-    L-BFGS-GPR 混合优化器（新版）
+    L-BFGS-GPR 混合优化器（融合版）
 
     策略流程：
-    1. 初始采样：使用 PyBerny 生成初始训练数据
-    2. 外层 BFGS：PyBerny 真实计算，可靠优化，继承历史状态
-    3. 训练 GPR：使用滑动窗口管理训练数据
-    4. 内层探索：GPR 预测 + 自研梯度下降法，快速探索
-    5. 验证择优：选择最优起点进行下一轮
+    1. 第 1 轮外层：使用 n_init + outer_steps 步 PyBerny 真实计算（融合初始采样）
+    2. 训练 GPR：使用滑动窗口管理训练数据
+    3. 内层探索：GPR 预测 + 自研梯度下降法，快速探索
+    4. 验证择优：选择最优起点进行下一轮
+    5. 后续轮次：外层 outer_steps 步 + 内层探索 + 择优
     """
 
     def __init__(self, config: Dict[str, Any]):
@@ -49,6 +54,9 @@ class HybridOptimizer(BaseOptimizer):
         hybrid_config = config.get('hybrid', {})
         self.outer_steps = hybrid_config.get('outer_steps', 10)    # 外层步数
         self.inner_steps = hybrid_config.get('inner_steps', 5)     # 内层步数
+        
+        # GPR 初始采样点数（用于第 1 轮外层迭代）
+        self.n_init = config.get('gpr', {}).get('n_init', 5)
 
         # 内层优化配置（自研梯度下降法）
         inner_opt_config = hybrid_config.get('inner_opt', {})
@@ -136,7 +144,7 @@ class HybridOptimizer(BaseOptimizer):
             print("=" * 70)
             print("PyBerny-GPR 混合优化开始")
             print("=" * 70)
-            print(f"外层步数：{self.outer_steps}")
+            print(f"外层步数：{self.outer_steps}（第 1 轮：{self.n_init + self.outer_steps} 步）")
             print(f"内层步数：{self.inner_steps}")
             print(f"验证频率：{self.validate_every}（0=仅验证最后一点）")
             print(f"预测误差阈值：{self.prediction_error_threshold}")
@@ -145,11 +153,8 @@ class HybridOptimizer(BaseOptimizer):
 
         self.history.start_time = time.time()
 
-        # 阶段 1: 初始采样
-        self._initial_sampling(molecule)
-
-        # 从初始采样点中选择最优作为起点
-        coords = self._get_best_initial_point()
+        # 从初始分子开始，不再进行初始采样
+        coords = molecule.get_coords_flat()
 
         # 主循环 - 获取收敛配置
         hybrid_config = self.config.get('hybrid', {})
@@ -163,16 +168,16 @@ class HybridOptimizer(BaseOptimizer):
 
         round_num = 0
         no_improvement_count = 0
-        
+
         while round_num < max_rounds:
             round_num += 1
             self.current_round = round_num
-            
+
             if self.config.get('optimizer', {}).get('verbose', True):
                 print(f"\n{'='*70}")
                 print(f"第 {self.current_round} 轮优化")
                 print(f"{'='*70}")
-            
+
             # 保存本轮起点
             # 使用缓存方法，如果起点是上一轮终点（已计算过），则复用缓存
             outer_start_energy, outer_start_gradient = self._get_energy_gradient(coords)
@@ -184,14 +189,18 @@ class HybridOptimizer(BaseOptimizer):
 
             if self.config.get('optimizer', {}).get('verbose', True):
                 print(f"本轮起点：E={outer_start_energy:.8f}, |g|={np.linalg.norm(outer_start_gradient):.6f}")
-            
+
             # 清除缓存（下一轮起点会在 _get_energy_gradient 中自动检查缓存）
             self._cached_energy = None
             self._cached_gradient = None
             self._cached_coords_hash = None
-            
+
             # 阶段 2A: 外层 L-BFGS（传入起点能量/梯度，避免重复计算）
-            outer_result = self._run_outer_bfgs(coords, outer_start_energy, outer_start_gradient)
+            # 第 1 轮使用 n_init + outer_steps 步，后续轮次使用 outer_steps 步
+            outer_result = self._run_outer_bfgs(
+                coords, outer_start_energy, outer_start_gradient,
+                is_first_round=(round_num == 1)
+            )
 
             # 检查外层是否提前终止（已满足 scipy 收敛条件）
             if outer_result.get('early_stop', False):
@@ -279,81 +288,10 @@ class HybridOptimizer(BaseOptimizer):
                 high = coords[i, j] + radius
                 self._bounds.append((low, high))
 
-    def _initial_sampling(self, molecule: Molecule) -> None:
-        """
-        阶段 1: 初始采样
-
-        使用 PyBerny L-BFGS 生成初始训练数据
-        """
-        n_init = self.config.get('gpr', {}).get('n_init', 5)
-
-        if self.config.get('optimizer', {}).get('verbose', True):
-            print(f"\n初始采样：使用 PyBerny 生成 {n_init} 个训练点...")
-
-        coords = molecule.get_coords_flat()
-
-        # 使用 PyBerny 的 run_fixed_steps 方法生成初始采样点
-        # 注意：这里创建临时历史，不干扰主历史
-        temp_history = OptimizationHistory()
-        
-        # 保存当前的 history 引用
-        saved_history = self.history
-        self.history = temp_history
-
-        # 运行 PyBerny L-BFGS 收集初始点
-        final_coords, init_history, init_pyscf_calls = self.lbfgs_optimizer.run_fixed_steps(
-            coords,
-            n_init,
-            self.calculator,
-            self.atom_symbols
-        )
-
-        # 恢复主历史
-        self.history = saved_history
-
-        # 累加 PySCF 调用次数（初始采样没有复用，全部计入）
-        self.outer_pyscf_calls += init_pyscf_calls
-
-        # 将初始采样点添加到训练数据和主历史（round_num=0, stage='outer'）
-        for iteration in init_history.iterations:
-            self.training_data['coords'].append(iteration.coords.copy())
-            self.training_data['energy'].append(iteration.energy)
-            self.training_data['gradient'].append(iteration.gradient.copy())
-
-            # 记录到主历史（初始采样：round_num=0, stage='outer'）
-            data = IterationData(
-                iteration=len(self.training_data['coords']),
-                energy=iteration.energy,
-                gradient=iteration.gradient,
-                coords=iteration.coords.copy(),
-                round_num=0,
-                stage='outer'
-            )
-            self.history.add_iteration(data)
-
-            # 注意：不额外打印，pyberny_optimizer 已经打印了 Iter X: 信息
-
-        if self.config.get('optimizer', {}).get('verbose', True):
-            print(f"初始采样完成，收集 {len(self.training_data['coords'])} 个点\n")
-
-    def _get_best_initial_point(self) -> np.ndarray:
-        """从初始采样点中选择梯度最小的作为起点"""
-        if not self.training_data['coords']:
-            return self.current_mol.get_coords_flat()
-
-        grad_norms = [np.linalg.norm(g) for g in self.training_data['gradient']]
-        best_idx = np.argmin(grad_norms)
-
-        if self.config.get('optimizer', {}).get('verbose', True):
-            print(f"初始最优：Init {best_idx + 1}, "
-                  f"E={self.training_data['energy'][best_idx]:.8f}, "
-                  f"|g|={grad_norms[best_idx]:.6f}\n")
-
-        return self.training_data['coords'][best_idx].copy()
-
-    def _run_outer_bfgs(self, coords: np.ndarray, 
+    def _run_outer_bfgs(self, coords: np.ndarray,
                         initial_energy: Optional[float] = None,
-                        initial_gradient: Optional[np.ndarray] = None) -> Dict[str, Any]:
+                        initial_gradient: Optional[np.ndarray] = None,
+                        is_first_round: bool = False) -> Dict[str, Any]:
         """
         阶段 2A: 外层 BFGS（使用 PyBerny，支持跨轮次继承 L-BFGS 历史）
 
@@ -364,19 +302,23 @@ class HybridOptimizer(BaseOptimizer):
             coords: 初始坐标
             initial_energy: 初始能量（可选，如果提供则避免重复计算）
             initial_gradient: 初始梯度（可选，如果提供则避免重复计算）
+            is_first_round: 是否为第 1 轮（如果是，则使用 n_init + outer_steps 步）
 
         Returns:
             dict: {coords, energy, gradient, history}
         """
+        # 第 1 轮使用 n_init + outer_steps 步，后续轮次使用 outer_steps 步
+        actual_outer_steps = self.n_init + self.outer_steps if is_first_round else self.outer_steps
+        
         if self.config.get('optimizer', {}).get('verbose', True):
-            print(f"\n[外层 PyBerny] 执行 {self.outer_steps} 步...")
+            print(f"\n[外层 PyBerny] 执行 {actual_outer_steps} 步...")
 
         history = []
 
         # 使用 PyBerny 的 run_fixed_steps 方法执行固定步数的 L-BFGS 优化
         final_coords, lbfgs_history, outer_pyscf_calls = self.lbfgs_optimizer.run_fixed_steps(
             coords,
-            self.outer_steps,
+            actual_outer_steps,
             self.calculator,
             self.atom_symbols,
             initial_energy,
@@ -426,12 +368,12 @@ class HybridOptimizer(BaseOptimizer):
 
         # 检查是否提前终止（实际迭代次数 < 设置的 outer_steps）
         actual_steps = len(history)
-        early_stop = actual_steps < self.outer_steps
+        early_stop = actual_steps < actual_outer_steps
 
         if self.config.get('optimizer', {}).get('verbose', True):
             print(f"外层终点：E={final_energy:.8f}, |g|={np.linalg.norm(final_gradient):.6f}")
             if early_stop:
-                print(f"⚠ 外层 PyBerny 提前终止（实际 {actual_steps} 步 < 设置 {self.outer_steps} 步）")
+                print(f"⚠ 外层 PyBerny 提前终止（实际 {actual_steps} 步 < 设置 {actual_outer_steps} 步）")
                 print(f"  原因：PyBerny L-BFGS 已满足收敛条件")
             else:
                 print(f"外层 PyBerny 完成 {actual_steps} 步")
