@@ -177,15 +177,15 @@ def main():
 
     parser.add_argument('--method', type=str, default='pyberny',
                        choices=['pyberny', 'hybrid'],
-                       help='优化方法：pyberny (纯 PyBerny 基准) 或 hybrid (PyBerny+GPR 混合)')
+                       help='优化方法：pyberny (纯 PyBerny 基准) 或 hybrid (PyBerny+AI 混合)')
     parser.add_argument('--molecule', type=str, default='ethanol',
                        help='分子名称 (default: ethanol)')
     parser.add_argument('--smiles', type=str, default=None,
                        help='SMILES 字符串（覆盖 --molecule）')
     parser.add_argument('--perturb', type=float, default=0.0,
                        help='初始扰动强度 (Å) (default: 0.0)')
-    parser.add_argument('--seed', type=int, default=24,
-                       help='随机种子 (default: 24)')
+    parser.add_argument('--seed', type=int, default=42,
+                       help='随机种子 (default: 42)')
     parser.add_argument('--config', type=str, default=None,
                        help='配置文件路径')
     parser.add_argument('--output', type=str, default=None,
@@ -194,6 +194,13 @@ def main():
                        help='最大迭代次数')
     parser.add_argument('--threshold', type=float, default=None,
                        help='收敛阈值')
+    parser.add_argument('--xyz_path', type=str, default=None,
+                       help='.xyz 文件路径（提供初始构型文件进行优化）')
+    parser.add_argument('--xyz_name', type=str, default=None,
+                       help='自建优化对应的文件层级命名（与 --xyz_path 同时使用）')
+    parser.add_argument('--ai_method', type=str, default=None,
+                       choices=['gpr'],
+                       help='AI 方法类型（仅当 --method 为 hybrid 时使用）: gpr (梯度预测 GPR)，可扩展其他方法')
 
     args = parser.parse_args()
 
@@ -223,21 +230,48 @@ def main():
     if args.smiles:
         config['molecule']['smiles'] = args.smiles
 
-    if args.seed != 24:
+    if args.seed != 42:
         config['molecule']['seed'] = args.seed
 
     if args.perturb != 0.0:
         config['molecule']['perturb'] = args.perturb
 
     # 获取 AI 方法类型（用于输出文件命名）
+    # 优先级：命令行 --ai_method > config 中的 hybrid.ai_method > 默认 gpr
     ai_method = None
     if args.method == 'hybrid':
-        ai_method = config.get('gpr', {}).get('type', 'gradient_predicting')
+        if args.ai_method:
+            # 命令行指定了 --ai_method，使用命令行参数
+            ai_method = args.ai_method
+            # 更新配置
+            if 'hybrid' not in config:
+                config['hybrid'] = {}
+            config['hybrid']['ai_method'] = args.ai_method
+        else:
+            # 未指定 --ai_method，使用 config 中的默认值
+            ai_method = config.get('hybrid', {}).get('ai_method', 'gpr')
 
     # 获取分子信息
     smiles = config['molecule']['smiles']
     seed = config['molecule']['seed']
     perturb = config['molecule']['perturb']
+    
+    # 获取 xyz 文件参数
+    xyz_path = config['molecule'].get('xyz_path')
+    xyz_name = config['molecule'].get('xyz_name')
+    
+    # 命令行参数覆盖配置
+    if args.xyz_path:
+        if 'molecule' not in config:
+            config['molecule'] = {}
+        config['molecule']['xyz_path'] = args.xyz_path
+        xyz_path = args.xyz_path
+    
+    if args.xyz_name:
+        if 'molecule' not in config:
+            config['molecule'] = {}
+        config['molecule']['xyz_name'] = args.xyz_name
+        xyz_name = args.xyz_name
 
     # 修改输出目录：添加 smiles 和扰动水平
     if 'output' not in config:
@@ -245,31 +279,65 @@ def main():
 
     original_save_dir = config['output'].get('save_dir', './output')
 
-    if perturb == int(perturb):
-        perturb_str = str(int(perturb))
+    # 判断是否使用 xyz 文件模式
+    use_xyz_mode = (xyz_path is not None) or (xyz_name is not None)
+    
+    if use_xyz_mode:
+        # xyz 文件模式：两个参数必须同时存在或同时为空
+        if (xyz_path is None) != (xyz_name is None):
+            raise ValueError(
+                "错误：--xyz_path 和 --xyz_name 必须同时设置或同时为空！\n"
+                "  --xyz_path: .xyz 文件路径\n"
+                "  --xyz_name: 输出目录命名"
+            )
+        
+        # 使用 xyz_name 作为目录名
+        dir_name = xyz_name
+        config['output']['save_dir'] = os.path.join(original_save_dir, dir_name)
+        
+        # 创建输出管理器
+        output_manager = create_output_manager(config, ai_method=ai_method, method_name=args.method)
+
+        print(f"\n{'='*70}")
+        print("PyBerny-GPR 混合优化项目")
+        print(f"{'='*70}")
+        print(f"模式：从 XYZ 文件读取初始构型")
+        print(f"XYZ 文件：{xyz_path}")
+        print(f"输出目录：{output_manager.method_dir}")
+        print(f"方法：{args.method}")
+        if ai_method:
+            print(f"AI 方法：{ai_method}")
+        print(f"{'='*70}")
+        
+        # 从 xyz 文件创建分子
+        molecule = Molecule.from_xyz_file(xyz_path, name=xyz_name)
     else:
-        perturb_str = f"{perturb:.1f}".rstrip('0').rstrip('.')
+        # 原有模式：使用 SMILES 生成分子
+        if perturb == int(perturb):
+            perturb_str = str(int(perturb))
+        else:
+            perturb_str = f"{perturb}"
 
-    dir_name = f"{smiles}_{perturb_str}"
-    config['output']['save_dir'] = os.path.join(original_save_dir, dir_name)
+        dir_name = f"{smiles}_{perturb_str}"
+        config['output']['save_dir'] = os.path.join(original_save_dir, dir_name)
 
-    # 创建输出管理器
-    output_manager = create_output_manager(config, ai_method=ai_method, method_name=args.method)
+        # 创建输出管理器
+        output_manager = create_output_manager(config, ai_method=ai_method, method_name=args.method)
 
-    print(f"\n{'='*70}")
-    print("PyBerny-GPR 混合优化项目")
-    print(f"{'='*70}")
-    print(f"分子：{smiles}")
-    print(f"扰动：{perturb} Å")
-    print(f"种子：{seed}")
-    print(f"方法：{args.method}")
-    if ai_method:
-        print(f"AI 方法：{ai_method}")
-    print(f"输出目录：{output_manager.save_dir}")
-    print(f"{'='*70}")
+        print(f"\n{'='*70}")
+        print("PyBerny-GPR 混合优化项目")
+        print(f"{'='*70}")
+        print(f"分子：{smiles}")
+        print(f"扰动：{perturb} Å")
+        print(f"种子：{seed}")
+        print(f"方法：{args.method}")
+        if ai_method:
+            print(f"AI 方法：{ai_method}")
+        print(f"输出目录：{output_manager.method_dir}")
+        print(f"{'='*70}")
 
-    # 创建分子
-    molecule = Molecule.from_smiles(smiles, seed=seed, perturb_strength=perturb)
+        # 创建分子
+        molecule = Molecule.from_smiles(smiles, seed=seed, perturb_strength=perturb)
 
     print(f"\n初始结构:")
     print(f"  原子数：{molecule.n_atoms}")

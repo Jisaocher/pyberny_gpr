@@ -3,8 +3,11 @@
 # 分子设置
 molecule:
   smiles: "CCO"           # 乙醇 SMILES
-  seed: 24                 # 随机种子
+  seed: 42                 # 随机种子
   perturb: 0    # 初始扰动强度 (Å)，0 用于快速收敛
+  # xyz 文件路径（用于从初始构型文件优化）
+  xyz_path: null           # .xyz 文件路径，默认 None
+  xyz_name: null           # 自建优化对应的文件层级命名，默认 None
 
 # 计算方法
 calculation:
@@ -59,9 +62,14 @@ selection_weights:
 
 # 混合策略设置（新版：外层 + 内层）
 hybrid:
+  # AI 方法选择（支持多种 AI 方法）
+  ai_method: "gpr"          # AI 方法类型：gpr (梯度预测 GPR), 可扩展其他方法
+                            # 仅当 --method 为 hybrid 时使用
+                            # 若命令行未指定 --ai_method，则使用此默认值
+
   # 内外层步数
   outer_steps: 10           # 外层 L-BFGS 步数（真实计算，收集训练数据）
-  inner_steps: 5            # 内层探索步数（GPR 预测梯度，梯度下降法）
+  inner_steps: 5            # 内层探索步数（AI 预测梯度，梯度下降法）
 
   # 内层优化配置（自研梯度下降法）
   inner_opt:

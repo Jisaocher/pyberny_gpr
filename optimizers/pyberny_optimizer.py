@@ -292,6 +292,10 @@ class PyBernyOptimizer(BaseOptimizer):
             self._prev_coords = current_coords.copy()
             step += 1
 
+        if self.config.get('optimizer', {}).get('verbose', True):
+            if step > 0:
+                print(f"外层完成 {step} 步")
+
         return current_coords, self.history, actual_pyscf_calls
 
 

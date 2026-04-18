@@ -100,7 +100,6 @@ class PyBernyBaselineOptimizer(BaseOptimizer):
             print("=" * 70)
             print("PyBerny 基准优化开始（完整 BFGS，一次性运行）")
             print("=" * 70)
-            print(f"初始能量：{self._energy_func.energy_only(x0):.10f} Hartree")
             print(f"原子数：{molecule.n_atoms}")
             print(f"自由度：{len(x0)}")
             print(f"最大步数：{self.maxsteps}")
@@ -110,19 +109,33 @@ class PyBernyBaselineOptimizer(BaseOptimizer):
 
         self.history.start_time = time.time()
 
+        # 初始能量和梯度计算（缓存结果供第一轮迭代使用）
+        initial_energy, initial_gradient = self._energy_func(x0)
+        gradient_norm = np.linalg.norm(initial_gradient)
+
+        if self.config.get('optimizer', {}).get('verbose', True):
+            print(f"初始能量：{initial_energy:.10f} Hartree")
+            print(f"初始梯度范数：{gradient_norm:.6f}")
+
         # 使用 berny 的标准迭代方式
         # 参考 berny 文档：
         #   optimizer = Berny(geom)
         #   for geom in optimizer:
         #       debug = optimizer.send((energy, gradients))
-        
+
         iteration = 0
         for geom in self._berny_optimizer:
             # 从几何结构获取坐标
             current_coords = np.array(geom.coords).flatten()
 
-            # 计算当前能量和梯度
-            current_energy, current_gradient = self._energy_func(current_coords)
+            # 如果是第一步，使用已计算的初始能量和梯度，避免重复计算
+            if iteration == 0 and np.allclose(current_coords, x0):
+                current_energy = initial_energy
+                current_gradient = initial_gradient
+            else:
+                # 计算当前能量和梯度
+                current_energy, current_gradient = self._energy_func(current_coords)
+
             gradient_norm = np.linalg.norm(current_gradient)
 
             # 记录当前点

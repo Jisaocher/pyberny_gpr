@@ -1,26 +1,94 @@
 # PyBerny-GPR 分子几何构型优化项目
 
-**分子几何构型优化 - PyBerny (BFGS) 与 GPR 混合策略研究**
+**分子几何构型优化 - PyBerny (BFGS) 与 AI 代理模型混合策略研究**
 
 ---
 
 ## 项目信息
 
-- **项目维护者**: 刘喆 (Liu Zhe)
-- **联系邮箱**: 3266048598@qq.com
-- **研究日期**: 2026
-- **项目类型**: 计算化学 + 人工智能（机器学习）
+| 项目 | 信息 |
+|------|------|
+| **项目维护者** | 刘喆 (Liu Zhe) |
+| **联系邮箱** | 3266048598@qq.com |
+| **研究日期** | 2026 |
+| **项目类型** | 计算化学 + 人工智能（机器学习） |
+| **项目路径** | `/mnt/e/wsl_dir/pyberny_gpr/` |
 
 ---
 
 ## 项目概述
 
-本项目实现了基于 **PyBerny (BFGS)** 和 **GPR (高斯过程回归)** 的分子几何构型优化混合策略。
+本项目实现了基于 **PyBerny (BFGS)** 和 **AI 代理模型** 的分子几何构型优化混合策略。
 
-**核心思想**：
-- **外层 (Outer Loop)**: 使用 PyBerny 进行真实量子化学计算，可靠优化并收集训练数据
-- **内层 (Inner Loop)**: 使用 GPR 预测梯度，快速探索势能面
-- **择优策略**: 从内外层结果中选择最优作为下一轮起点
+### 核心思想
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    PyBerny-AI 混合优化流程                    │
+├─────────────────────────────────────────────────────────────┤
+│  外层 (Outer Loop): PyBerny 真实量子化学计算 → 可靠优化        │
+│  内层 (Inner Loop): AI 模型预测梯度 → 快速探索                │
+│  择优策略：从内外层结果中选择最优作为下一轮起点               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 支持方法
+
+| 方法 | 说明 | 推荐场景 |
+|------|------|---------|
+| `pyberny` | 纯 PyBerny 基准（完整 BFGS） | 对比基准、小分子快速优化 |
+| `hybrid` | PyBerny+AI 混合策略 ⭐ | 大分子、需要加速收敛的场景 |
+
+### 支持的 AI 方法（仅 hybrid 模式）
+
+| AI 方法 | 说明 | 状态 |
+|--------|------|------|
+| `gpr` | 梯度预测高斯过程回归 | ✅ 已实现（默认） |
+| `neural_network` | 神经网络预测 | 🔲 可扩展 |
+
+---
+
+## 快速开始
+
+### 1. 安装依赖
+
+```bash
+cd /mnt/e/wsl_dir/pyberny_gpr
+pip install -r requirements.txt
+```
+
+### 2. 运行优化
+
+```bash
+# 方法 1: 纯 PyBerny 基准
+python main.py --method pyberny --molecule ethanol
+
+# 方法 2: PyBerny+AI 混合（推荐）
+python main.py --method hybrid --molecule ethanol --perturb 0.1
+
+# 方法 3: 指定 AI 方法
+python main.py --method hybrid --molecule ethanol --perturb 0.1 --ai_method gpr
+
+# 方法 4: 从 XYZ 文件读取初始构型
+python main.py --xyz_path ./config/initial.xyz --xyz_name my_mol --method hybrid
+```
+
+### 3. 查看结果
+
+```bash
+# 输出目录结构
+output/
+├── CCO_0.1/
+│   ├── pyberny/           # 纯 PyBerny 结果
+│   │   ├── structures/
+│   │   └── plots/
+│   └── hybrid_gpr/        # 混合策略结果
+│       ├── structures/
+│       └── plots/
+
+# 3D 分子结构可视化
+python draw_structure3D.py
+```
 
 ---
 
@@ -28,188 +96,61 @@
 
 ```
 pyberny_gpr/
-├── core/                   # 核心数据类
-│   ├── molecule.py        # 分子结构、迭代历史类
-│   └── calculator.py      # 量子化学计算接口
-├── optimizers/             # 优化器实现
-│   ├── base.py            # 优化器基类
-│   ├── hybrid.py          # PyBerny+GPR 混合优化器 ⭐
-│   ├── pyberny_optimizer.py  # PyBerny BFGS 优化器
-│   └── pyberny_baseline.py   # 纯 PyBerny 基准优化器
-├── models/                 # 机器学习模型
-│   ├── gpr_base.py        # GPR 基类
-│   └── energy_gradient_gpr.py  # 能量 - 梯度 GPR 模型 ⭐
-├── visualization/          # 可视化模块
-│   ├── structure3d.py     # 3D 分子结构可视化
-│   └── plots.py           # 能量/梯度图表
-├── utils/                  # 工具函数
-│   ├── io_utils.py        # 输入输出工具
-│   └── converters.py      # 坐标转换工具
-├── config/                 # 配置文件
-│   └── default_config.yaml # 默认配置
-├── main.py                 # 主程序入口
-├── run_comparison.py       # 对比运行脚本
-├── draw_structure3D.py     # 3D 结构可视化脚本
-├── requirements.txt        # 依赖列表
-├── README.md               # 本文件
-├── DESIGN.md               # 详细设计文档
-└── USAGE.md                # 使用说明文档
+├── core/                       # 核心模块
+│   ├── molecule.py            # 分子结构、优化历史类
+│   └── calculator.py          # 量子化学计算接口（PySCF 后端）
+│
+├── optimizers/                 # 优化器模块
+│   ├── base.py                # 优化器基类
+│   ├── hybrid.py              # PyBerny+AI 混合优化器 ⭐
+│   ├── pyberny_optimizer.py   # PyBerny BFGS 优化器
+│   └── pyberny_baseline.py    # 纯 PyBerny 基准优化器
+│
+├── models/                     # AI 模型模块
+│   ├── gpr_base.py            # GPR 基类（统一接口）
+│   └── energy_gradient_gpr.py # 能量 - 梯度 GPR 模型 ⭐
+│
+├── visualization/              # 可视化模块
+│   ├── structure3d.py         # 3D 分子结构可视化（py3Dmol）
+│   └── plots.py               # 能量/梯度收敛曲线
+│
+├── utils/                      # 工具模块
+│   ├── io_utils.py            # 输入输出管理
+│   └── converters.py          # 坐标转换工具
+│
+├── config/                     # 配置文件
+│   └── default_config.yaml    # 默认配置参数
+│
+├── main.py                     # 主程序入口
+├── draw_structure3D.py         # 3D 结构可视化脚本
+│
+├── requirements.txt            # Python 依赖列表
+├── README.md                   # 项目总览（本文件）
+├── DESIGN.md                   # 详细设计文档
+└── USAGE.md                    # 详细使用说明
 ```
 
 ---
 
-## 两种优化流程
+## 核心特性
 
-### 流程 1: 纯 PyBerny 基准方法
+### 1. 混合优化策略
 
-**用途**: 作为对比基准，验证混合方法的有效性
+| 阶段 | 说明 | 优势 |
+|------|------|------|
+| **外层优化** | PyBerny BFGS 真实计算 | 可靠、准确 |
+| **内层探索** | AI 模型预测梯度 + 梯度下降 | 快速、节省计算 |
+| **择优策略** | 综合能量和梯度选择最优 | 平衡探索与利用 |
 
-**特点**:
-- 使用 berny 库实现完整的 BFGS 优化
-- 一次性运行到底，中间不打断
-- 跨步次继承 Hessian 近似状态
-- **冗余内坐标系统**（比笛卡尔坐标更高效）
-- Trust Region 动态调整
-- 复合收敛判据（能量 + 梯度 + 位移）
+### 2. 融合设计
 
-**运行命令**:
-```bash
-python main.py --method pyberny --molecule ethanol
-```
+- **第 1 轮外层**：`n_init + outer_steps` 步（融合初始采样）
+- **后续轮次**：`outer_steps` 步
+- **滑动窗口**：只保留最近的外层迭代数据用于训练
 
-### 流程 2: PyBerny+GPR 混合策略 ⭐
+### 3. 配置同步
 
-**用途**: 使用 AI 方法加速收敛，同时保持优化可靠性
-
-**特点**:
-- 外层 PyBerny BFGS（真实计算，每轮独立运行）
-- 内层 GPR 梯度预测（快速探索）
-- 滑动窗口管理训练数据
-- 择优策略选择最优起点
-
-**运行命令**:
-```bash
-python main.py --method hybrid --molecule ethanol --perturb 0.1
-```
-
----
-
-## 核心设计
-
-### 混合优化策略流程
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    PyBerny-GPR 混合优化流程                   │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  第 1 轮：外层 PyBerny(n_init + outer_steps 步) → 训练 GPR      │
-│         → 内层 GPR 探索 (inner_steps 步) → 择优               │
-│                                                             │
-│  后续轮：外层 PyBerny(outer_steps 步) → 训练 GPR → 内层探索    │
-│         → 择优 → 循环                                        │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
-
-### 关键参数配置
-
-在 `config/default_config.yaml` 中调整：
-
-```yaml
-# 融合设计：第 1 轮外层使用 n_init + outer_steps 步，融合初始采样
-hybrid:
-  outer_steps: 10           # 外层 PyBerny 步数（第 1 轮：15 步 = 5+10）
-  inner_steps: 5            # 内层 GPR 探索步数
-
-  # 择优策略
-  selection_metric: "gradient"
-  selection_weights:
-    energy_weight: 0.3      # 能量权重
-    gradient_weight: 0.7    # 梯度权重（推荐 > 能量权重）
-
-  # 收敛判定
-  convergence:
-    threshold: 1.0e-4       # 梯度收敛阈值
-    max_rounds: 50          # 最大优化轮数
-
-gpr:
-  n_init: 5                 # 初始采样点数（仅用于第 1 轮）
-  max_training_points: 10   # 滑动窗口大小
-  local_radius: 0.1         # 局部搜索半径 (Å)
-
-# PyBerny 配置（混合方法外层与基准方法使用相同参数）
-berny:
-  maxsteps: 500             # 最大步数
-  trust: 0.3                # 信任半径 (Å)
-  gradient_threshold: 1e-4  # 梯度收敛阈值
-  energy_threshold: 1e-6    # 能量收敛阈值
-  displacement_threshold: 1e-3  # 位移收敛阈值
-```
-
----
-
-## 安装与使用
-
-### 安装依赖
-
-```bash
-cd /mnt/e/wsl_dir/pyberny_gpr
-pip install -r requirements.txt
-```
-
-### 快速开始
-
-```bash
-# 1. 纯 PyBerny 基准方法
-python main.py --method pyberny --molecule ethanol
-
-# 2. PyBerny+GPR 混合优化（推荐）
-python main.py --method hybrid --molecule ethanol --perturb 0.1
-
-# 3. 对比实验
-python run_comparison.py --smiles CCO --perturb 0.1
-```
-
-### 命令行参数
-
-| 参数 | 说明 | 默认值 |
-|------|------|--------|
-| `--method` | 优化方法 (`pyberny` 或 `hybrid`) | `pyberny` |
-| `--molecule` | 分子名称 | `ethanol` |
-| `--smiles` | SMILES 字符串 | `None` |
-| `--perturb` | 初始扰动强度 (Å) | `0.0` |
-| `--seed` | 随机种子 | `24` |
-| `--max-iter` | 最大迭代次数 | `300` |
-| `--threshold` | 收敛阈值 | `5e-4` |
-
----
-
-## 输出说明
-
-### 输出目录结构
-
-```
-output/
-├── {method}_YYYYMMDD_HHMMSS.json      # 优化历史
-├── {method}_trajectory_*.xyz          # 优化轨迹
-├── {method}_details_*.json            # 详细信息
-├── plots/
-│   ├── {method}_energy.png
-│   ├── {method}_gradient.png
-│   └── {method}_combined.png
-└── structures/
-    ├── {method}_initial.xyz
-    ├── {method}_initial.html
-    ├── {method}_final.xyz
-    └── {method}_final.html
-```
-
-### 3D 分子结构可视化
-
-```bash
-python draw_structure3D.py
-```
+混合方法的外层优化与基准方法使用**完全相同的 berny 配置**，确保公平对比。
 
 ---
 
@@ -217,18 +158,12 @@ python draw_structure3D.py
 
 | 类别 | 工具/库 |
 |------|--------|
-| 量子化学 | PySCF, berny |
-| 分子处理 | RDKit, ASE |
-| 优化算法 | **berny (BFGS)** |
-| 机器学习 | scikit-learn (GPR) |
-| 可视化 | Matplotlib, py3Dmol |
-| 配置管理 | PyYAML |
-
----
-
-## PyBerny 说明
-
-**PyBerny** 是基于 `berny` 库的 BFGS 优化器，具有以下特点：
+| **量子化学** | PySCF, berny |
+| **分子处理** | RDKit, ASE |
+| **优化算法** | berny (完整 BFGS) |
+| **机器学习** | scikit-learn (GPR) |
+| **可视化** | Matplotlib, py3Dmol |
+| **配置管理** | PyYAML |
 
 ### PyBerny vs L-BFGS
 
@@ -239,19 +174,109 @@ python draw_structure3D.py
 | 坐标系统 | **冗余内坐标** | 笛卡尔坐标 |
 | 收敛速度 | 更快 | 较慢 |
 
-**注意**：
-1. 本项目使用 PyBerny (完整 BFGS)，不是 L-BFGS
-2. 混合方法的外层优化与基准方法使用**完全相同的 berny 配置**，确保公平对比
+---
+
+## 命令行参数
+
+| 参数 | 说明 | 默认值 |
+|------|------|--------|
+| `--method` | 优化方法 (`pyberny` / `hybrid`) | `pyberny` |
+| `--molecule` | 分子名称 | `ethanol` |
+| `--smiles` | SMILES 字符串 | `None` |
+| `--perturb` | 初始扰动强度 (Å) | `0.0` |
+| `--seed` | 随机种子 | `24` |
+| `--max-iter` | 最大迭代次数 | `300` |
+| `--threshold` | 收敛阈值 | `1.0e-4` |
+| `--xyz_path` | .xyz 文件路径 | `None` |
+| `--xyz_name` | 输出目录命名 | `None` |
+| `--ai_method` | AI 方法（仅 hybrid） | `gpr` |
+
+**注意**：`--xyz_path` 和 `--xyz_name` 必须同时设置或同时为空。
 
 ---
 
-## 文档说明
+## 配置参数（核心）
+
+编辑 `config/default_config.yaml`：
+
+```yaml
+# 混合策略核心参数
+hybrid:
+  ai_method: "gpr"           # AI 方法类型
+  outer_steps: 10            # 外层步数（第 1 轮：15 步 = 5+10）
+  inner_steps: 5             # 内层探索步数
+  
+  # 择优权重（推荐 gradient_weight > energy_weight）
+  selection_weights:
+    energy_weight: 0.3
+    gradient_weight: 0.7
+
+# GPR 参数
+gpr:
+  n_init: 5                  # 初始采样点数
+  max_training_points: 10    # 滑动窗口大小
+  local_radius: 0.1          # 局部搜索半径 (Å)
+
+# PyBerny 参数（基准 + 混合外层通用）
+berny:
+  maxsteps: 500
+  trust: 0.3                 # 信任半径 (Å)
+  gradient_threshold: 1e-4   # 梯度收敛阈值
+```
+
+---
+
+## 输出说明
+
+### 目录结构
+
+```
+output/
+├── {smiles}_{perturb}/           # 按分子和扰动水平组织
+│   ├── pyberny/                  # 纯 PyBerny 结果
+│   │   ├── pyberny_YYYYMMDD_HHMMSS.json
+│   │   ├── pyberny_trajectory_*.xyz
+│   │   ├── structures/
+│   │   └── plots/
+│   └── hybrid_{ai_method}/       # 混合策略结果
+│       ├── hybrid_gpr_YYYYMMDD_HHMMSS.json
+│       ├── hybrid_gpr_trajectory_*.xyz
+│       ├── structures/
+│       └── plots/
+```
+
+### 文件类型
+
+| 文件 | 说明 |
+|------|------|
+| `*.json` | 优化历史（能量、梯度、坐标） |
+| `*_trajectory_*.xyz` | 优化轨迹（含梯度信息） |
+| `*_details_*.json` | 详细迭代信息 |
+| `structures/*.xyz` | 初始/最终结构 |
+| `structures/*.html` | 3D 交互式分子结构 |
+| `plots/*.png` | 能量/梯度收敛曲线 |
+
+---
+
+## 性能基准
+
+乙醇分子（RHF/cc-pVDZ）典型结果：
+
+| 方法 | 初始能量 (Hartree) | 最优能量 (Hartree) | 迭代次数 |
+|------|-------------------|-------------------|---------|
+| PyBerny (无扰动) | -154.0803 | -154.0927 | ~20 |
+| PyBerny (扰动 0.5) | -153.0956 | -153.9109 | ~30 |
+| Hybrid-GPR (扰动 0.5) | -153.0956 | -153.9109 | ~25 |
+
+---
+
+## 文档导航
 
 | 文档 | 说明 |
 |------|------|
-| `README.md` | 项目总览（本文件） |
-| `DESIGN.md` | 代码核心设计、参数说明、理论公式 |
-| `USAGE.md` | 详细使用说明 |
+| [README.md](README.md) | 项目总览（本文件） |
+| [DESIGN.md](DESIGN.md) | 核心设计、理论公式、算法流程 |
+| [USAGE.md](USAGE.md) | 详细使用说明、配置参数、常见问题 |
 
 ---
 

@@ -1,9 +1,9 @@
 """
-L-BFGS-GPR 混合优化策略（融合版）
+L-BFGS-AI 混合优化策略（融合版）
 
 核心思想：
 - 外层：使用 PyBerny (L-BFGS) 真实计算，可靠优化 + 收集训练数据
-- 内层：使用 GPR 预测值 + 自研梯度下降法，快速探索
+- 内层：使用 AI 模型预测值 + 自研梯度下降法，快速探索
 - 择优：从内外层结果中选择最优作为下一轮起点
 
 验证策略：
@@ -17,6 +17,10 @@ L-BFGS-GPR 混合优化策略（融合版）
 - 去除独立的初始采样阶段
 - 第 1 轮外层迭代使用 n_init + outer_steps 步，融合初始采样和外层优化
 - 轨迹输出只区分 Outer/Inner，不再展示"初始采样"标签
+
+支持的 AI 方法：
+- gpr: 梯度预测 GPR（默认）
+- 可扩展其他 AI 方法（如神经网络等）
 """
 import numpy as np
 from typing import Dict, Any, Optional, Tuple, List
@@ -26,18 +30,23 @@ from core.molecule import Molecule, OptimizationHistory, IterationData
 from core.calculator import QuantumCalculator
 from optimizers.base import BaseOptimizer
 from models.energy_gradient_gpr import EnergyGradientGPR
+from models.gpr_base import BaseGPRModel
 
 
 class HybridOptimizer(BaseOptimizer):
     """
-    L-BFGS-GPR 混合优化器（融合版）
+    L-BFGS-AI 混合优化器（融合版）
 
     策略流程：
     1. 第 1 轮外层：使用 n_init + outer_steps 步 PyBerny 真实计算（融合初始采样）
-    2. 训练 GPR：使用滑动窗口管理训练数据
-    3. 内层探索：GPR 预测 + 自研梯度下降法，快速探索
+    2. 训练 AI 模型：使用滑动窗口管理训练数据
+    3. 内层探索：AI 预测 + 自研梯度下降法，快速探索
     4. 验证择优：选择最优起点进行下一轮
     5. 后续轮次：外层 outer_steps 步 + 内层探索 + 择优
+
+    支持的 AI 方法：
+    - gpr: 梯度预测 GPR（默认）
+    - 可扩展其他 AI 方法（如神经网络等）
     """
 
     def __init__(self, config: Dict[str, Any]):
@@ -48,13 +57,16 @@ class HybridOptimizer(BaseOptimizer):
             config: 配置字典
         """
         super().__init__(config)
-        self.name = "L-BFGS-GPR Hybrid (New)"
+        self.name = "L-BFGS-AI Hybrid (New)"
 
         # 混合策略参数
         hybrid_config = config.get('hybrid', {})
         self.outer_steps = hybrid_config.get('outer_steps', 10)    # 外层步数
         self.inner_steps = hybrid_config.get('inner_steps', 5)     # 内层步数
-        
+
+        # AI 方法选择
+        self.ai_method = hybrid_config.get('ai_method', 'gpr')
+
         # GPR 初始采样点数（用于第 1 轮外层迭代）
         self.n_init = config.get('gpr', {}).get('n_init', 5)
 
@@ -80,8 +92,8 @@ class HybridOptimizer(BaseOptimizer):
         self.energy_weight = weights_config.get('energy_weight', 0.3)
         self.gradient_weight = weights_config.get('gradient_weight', 0.7)
 
-        # 组件
-        self.gpr_model = None
+        # AI 模型组件（根据 ai_method 动态选择）
+        self.ai_model = None  # AI 模型（BaseGPRModel 或其他 AI 模型）
         self.calculator = None
         self.lbfgs_optimizer = None  # PyBerny 优化器（支持状态继承）
 
@@ -99,16 +111,39 @@ class HybridOptimizer(BaseOptimizer):
         # PySCF 调用计数（独立于 training_data，不受滑动窗口限制）
         self.outer_pyscf_calls = 0  # 外层真实计算次数
         self.inner_pyscf_calls = 0  # 内层验证次数
-        
+
         # 缓存上一轮的终点能量/梯度，避免下一轮起点重复计算
         self._cached_energy = None
         self._cached_gradient = None
         self._cached_coords_hash = None
-        
+
         # GPR 训练数据：只保留最近指定次数的外层迭代数据
         hybrid_config = config.get('hybrid', {})
         self.max_outer_iterations = hybrid_config.get('max_outer_iterations', 15)
         self.max_training_points = config.get('gpr', {}).get('max_training_points', 30)
+
+    def _initialize_ai_model(self, molecule: Molecule) -> BaseGPRModel:
+        """
+        根据 ai_method 初始化 AI 模型
+
+        Args:
+            molecule: 分子对象
+
+        Returns:
+            AI 模型实例
+        """
+        dim = molecule.n_atoms * 3
+
+        if self.ai_method == 'gpr':
+            # 梯度预测 GPR
+            if self.config.get('optimizer', {}).get('verbose', True):
+                print(f"使用 AI 方法：GPR (梯度预测)")
+            return EnergyGradientGPR(self.config, dim)
+        else:
+            # 默认使用 GPR
+            if self.config.get('optimizer', {}).get('verbose', True):
+                print(f"使用 AI 方法：GPR (梯度预测) [默认]")
+            return EnergyGradientGPR(self.config, dim)
 
     def optimize(self, molecule: Molecule, calculator: QuantumCalculator) -> OptimizationHistory:
         """
@@ -126,18 +161,20 @@ class HybridOptimizer(BaseOptimizer):
         self.atom_symbols = molecule.atom_symbols
         self.history = OptimizationHistory()
 
-        # 初始化 GPR 模型
-        dim = molecule.n_atoms * 3
-        self.gpr_model = EnergyGradientGPR(self.config, dim)
+        # 初始化 AI 模型（根据 ai_method 动态选择）
+        self.ai_model = self._initialize_ai_model(molecule)
 
-        # 初始化 PyBerny 优化器（用于外层 L-BFGS，支持跨轮次继承历史）
+        # 初始化 PyBerny 优化器（用于外层 L-BFGS）
         from optimizers.pyberny_optimizer import PyBernyOptimizer
         self.lbfgs_optimizer = PyBernyOptimizer(self.config)
         # 注意：不需要在这里设置 current_mol 等，run_fixed_steps 会处理
 
         # 设置边界
         self._setup_bounds(molecule)
-        self.gpr_model.set_bounds(self._bounds)
+        
+        # 如果 AI 模型支持 set_bounds 方法，则设置边界
+        if hasattr(self.ai_model, 'set_bounds'):
+            self.ai_model.set_bounds(self._bounds)
 
         # 打印开始信息
         if self.config.get('optimizer', {}).get('verbose', True):
@@ -148,7 +185,9 @@ class HybridOptimizer(BaseOptimizer):
             print(f"内层步数：{self.inner_steps}")
             print(f"验证频率：{self.validate_every}（0=仅验证最后一点）")
             print(f"预测误差阈值：{self.prediction_error_threshold}")
-            print(f"初始能量：{self._calculate_energy(molecule.get_coords_flat()):.10f} Hartree")
+            # 使用 _get_energy_gradient 计算初始能量并缓存，供第一轮迭代起点复用
+            initial_energy, _ = self._get_energy_gradient(molecule.get_coords_flat())
+            print(f"初始能量：{initial_energy:.10f} Hartree")
             print("=" * 70)
 
         self.history.start_time = time.time()
@@ -195,6 +234,7 @@ class HybridOptimizer(BaseOptimizer):
             self._cached_gradient = None
             self._cached_coords_hash = None
 
+            # 阶段 1： 外层初始采样（仅第 1 轮，融合到外层 L-BFGS 中）
             # 阶段 2A: 外层 L-BFGS（传入起点能量/梯度，避免重复计算）
             # 第 1 轮使用 n_init + outer_steps 步，后续轮次使用 outer_steps 步
             outer_result = self._run_outer_bfgs(
@@ -231,7 +271,8 @@ class HybridOptimizer(BaseOptimizer):
             coords = best_candidate['coords'].copy()
             
             # 记录本轮数据到历史
-            self._record_round_history(outer_start, outer_result, inner_result, best_candidate)
+            # 择优点作为下一轮outer起点记录到历史，此处不需要重复记录
+            # self._record_round_history(outer_start, outer_result, inner_result, best_candidate)
             
             if self.config.get('optimizer', {}).get('verbose', True):
                 print(f"\n本轮最佳：{best_candidate['source']}")
@@ -360,11 +401,11 @@ class HybridOptimizer(BaseOptimizer):
             final_energy = history[-1]['energy']
             final_gradient = history[-1]['gradient']
         else:
-            # 如果没有历史（一步都没走），计算初始点
-            final_energy = self._calculate_energy(final_coords)
-            final_gradient = self.calculator.calculate_gradient(
+            # 如果没有历史（一步都没走），使用 calculate_energy_gradient 一次计算
+            final_energy, final_gradient = self.calculator.calculate_energy_gradient(
                 self.atom_symbols, final_coords.reshape(-1, 3)
             )
+            self.outer_pyscf_calls += 1
 
         # 检查是否提前终止（实际迭代次数 < 设置的 outer_steps）
         actual_steps = len(history)
@@ -401,12 +442,14 @@ class HybridOptimizer(BaseOptimizer):
         y = np.array(self.training_data['energy'])
         gradients = np.array(self.training_data['gradient'])
 
-        # 训练 GPR
-        self.gpr_model.clear_data()
+        # 训练 AI 模型
+        if hasattr(self.ai_model, 'clear_data'):
+            self.ai_model.clear_data()
         for i in range(len(X)):
-            self.gpr_model.add_data(X[i], y[i], gradients[i])
+            self.ai_model.add_data(X[i], y[i], gradients[i])
 
-        self.gpr_model.train(X, y, gradients)
+        if hasattr(self.ai_model, 'train'):
+            self.ai_model.train(X, y, gradients)
 
     def _limit_training_data(self) -> None:
         """
@@ -505,8 +548,8 @@ class HybridOptimizer(BaseOptimizer):
         for step in range(self.inner_steps):
             actual_steps = step + 1
 
-            # 1. GPR 预测当前梯度（只预测梯度，不预测能量）
-            gradient_pred = self.gpr_model.predict_gradient(coords)
+            # 1. AI 模型预测当前梯度（只预测梯度，不预测能量）
+            gradient_pred = self.ai_model.predict_gradient(coords)
             g_norm = np.linalg.norm(gradient_pred)
 
             # 2. 检查收敛（梯度足够小）
@@ -582,8 +625,9 @@ class HybridOptimizer(BaseOptimizer):
 
         # 内层最后一步：计算真实能量和梯度（用于与外层择优）
         coords_reshaped = coords.reshape(-1, 3)
-        inner_energy_true = self.calculator.calculate_energy(self.atom_symbols, coords_reshaped)
-        inner_gradient_true = self.calculator.calculate_gradient(self.atom_symbols, coords_reshaped)
+        inner_energy_true, inner_gradient_true = self.calculator.calculate_energy_gradient(
+            self.atom_symbols, coords_reshaped
+        )
 
         # 计数 PySCF 调用（内层验证）
         self.inner_pyscf_calls += 1
@@ -714,23 +758,21 @@ class HybridOptimizer(BaseOptimizer):
         # 检查是否命中缓存（相同的坐标）
         coords_hash = hash(coords_flat.tobytes())
         if self._cached_coords_hash is not None and coords_hash == self._cached_coords_hash:
+            # print(f"  → 使用缓存的能量和梯度（命中缓存）")
             return self._cached_energy, self._cached_gradient
 
         # 未命中缓存，计算并更新缓存
-        energy = self.calculator.calculate_energy(self.atom_symbols, coords_flat.reshape(-1, 3))
-        gradient = self.calculator.calculate_gradient(self.atom_symbols, coords_flat.reshape(-1, 3))
+        # print(f"  → 计算能量和梯度（未命中缓存）")
+        self.outer_pyscf_calls += 1
+        energy, gradient = self.calculator.calculate_energy_gradient(
+            self.atom_symbols, coords_flat.reshape(-1, 3)
+        )
 
         self._cached_energy = energy
         self._cached_gradient = gradient
         self._cached_coords_hash = coords_hash
 
         return energy, gradient
-
-    def _calculate_energy(self, coords_flat: np.ndarray) -> float:
-        """计算能量"""
-        return self.calculator.calculate_energy(
-            self.atom_symbols, coords_flat.reshape(-1, 3)
-        )
 
     def _print_summary(self) -> None:
         """打印优化总结"""
@@ -748,7 +790,7 @@ class HybridOptimizer(BaseOptimizer):
         print(f"总轮数：{self.current_round}")
         print(f"收敛状态：{'收敛' if self.history.converged else '未收敛'}")
         print(f"计算时间：{self.history.end_time - self.history.start_time:.2f} 秒")
-        print(f"GPR 训练点数：{self.gpr_model.n_training_points()}")
+        print(f"AI 模型训练点数：{self.ai_model.n_training_points()}")
 
         # PySCF 调用次数 = 外层真实计算次数 + 内层验证次数
         # 使用独立计数器，不受 training_data 滑动窗口限制

@@ -2,6 +2,7 @@
 分子结构数据类
 封装分子的基本信息、坐标操作和转换功能
 """
+import os
 import numpy as np
 from typing import List, Tuple, Optional, Dict
 from rdkit import Chem
@@ -48,26 +49,26 @@ class Molecule:
         return np.array([mass_dict.get(sym, 12.0) for sym in self.atom_symbols])
     
     @classmethod
-    def from_smiles(cls, smiles: str, seed: int = 24, 
+    def from_smiles(cls, smiles: str, seed: int = 42,
                     perturb_strength: float = 0.0) -> 'Molecule':
         """
         从 SMILES 字符串生成分子
-        
+
         Args:
             smiles: SMILES 字符串
             seed: 随机种子
             perturb_strength: 扰动强度 (Å)
-        
+
         Returns:
             Molecule 对象
         """
         mol = Chem.MolFromSmiles(smiles)
         mol = Chem.AddHs(mol)
         AllChem.EmbedMolecule(mol, randomSeed=seed)
-        
+
         atom_symbols = [atom.GetSymbol() for atom in mol.GetAtoms()]
         coords = mol.GetConformer().GetPositions().copy()
-        
+
         # 添加扰动
         if perturb_strength > 0:
             np.random.seed(seed)
@@ -75,8 +76,59 @@ class Molecule:
                 -perturb_strength, perturb_strength, size=coords.shape
             )
             coords += perturbation
-        
+
         return cls(atom_symbols, coords, smiles=smiles)
+
+    @classmethod
+    def from_xyz_file(cls, filepath: str, name: str = "") -> 'Molecule':
+        """
+        从 XYZ 文件读取分子构型
+
+        Args:
+            filepath: XYZ 文件路径
+            name: 分子名称
+
+        Returns:
+            Molecule 对象
+
+        Raises:
+            FileNotFoundError: 文件不存在
+            ValueError: XYZ 文件格式错误
+        """
+        if not os.path.exists(filepath):
+            raise FileNotFoundError(f"XYZ file not found: {filepath}")
+
+        with open(filepath, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+
+        if len(lines) < 2:
+            raise ValueError(f"Invalid XYZ file format: {filepath}")
+
+        # 第一行：原子数
+        try:
+            n_atoms = int(lines[0].strip())
+        except ValueError:
+            raise ValueError(f"Invalid XYZ file: first line should be atom count")
+
+        if len(lines) < n_atoms + 2:
+            raise ValueError(f"Invalid XYZ file: expected {n_atoms + 2} lines, got {len(lines)}")
+
+        # 第二行：注释行（通常包含分子式或名称）
+        comment = lines[1].strip()
+        if not name:
+            name = comment if comment else f"molecule_{os.path.basename(filepath)}"
+
+        # 读取原子坐标
+        atom_symbols = []
+        coords = []
+        for i in range(2, 2 + n_atoms):
+            parts = lines[i].strip().split()
+            if len(parts) < 4:
+                raise ValueError(f"Invalid XYZ file: line {i+1} should have 4 columns")
+            atom_symbols.append(parts[0])
+            coords.append([float(parts[1]), float(parts[2]), float(parts[3])])
+
+        return cls(atom_symbols, np.array(coords, dtype=np.float64), smiles="", name=name)
     
     def get_coords_flat(self) -> np.ndarray:
         """获取展平的坐标数组 (3*n_atoms,)"""

@@ -60,7 +60,7 @@ class EnergyGradientGPR(BaseGPRModel):
             kernel=kernel,
             normalize_y=True,
             n_restarts_optimizer=3,
-            random_state=24
+            random_state=42
         )
 
         # dim 个模型用于梯度预测（每个分量独立）
@@ -70,7 +70,7 @@ class EnergyGradientGPR(BaseGPRModel):
                 kernel=kernel,
                 normalize_y=True,
                 n_restarts_optimizer=2,
-                random_state=24
+                random_state=42
             )
             self.gradient_models.append(gpr)
 

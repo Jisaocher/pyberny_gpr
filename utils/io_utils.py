@@ -27,20 +27,26 @@ class OutputManager:
         Args:
             save_dir: 保存目录（如 output/CCO_0.1）
             format: 输出格式 ('json', 'csv', 'npy')
-            ai_method: AI 方法类型（'simple'/'gradient'/'random_forest'等）
+            ai_method: AI 方法类型（'gpr' 等）
             method_name: 优化方法名称（'pyberny'/'hybrid'）
         """
         self.save_dir = save_dir
         self.format = format
         self.ai_method = ai_method
         self.method_name = method_name
-        
+
         # 确定方法专用目录：output/{smiles}_{perturb}/{method}/
+        # 混合策略：添加 AI 方法信息，如 output/{smiles}_{perturb}/hybrid_gpr/
         if method_name:
-            self.method_dir = os.path.join(save_dir, method_name)
+            if method_name == 'hybrid' and ai_method:
+                # 混合策略：方法名包含 AI 方法信息
+                ai_suffix = self._get_ai_method_suffix() if ai_method else ai_method
+                self.method_dir = os.path.join(save_dir, f"{method_name}_{ai_suffix}")
+            else:
+                self.method_dir = os.path.join(save_dir, method_name)
         else:
             self.method_dir = save_dir
-        
+
         # 创建目录
         os.makedirs(self.method_dir, exist_ok=True)
         os.makedirs(os.path.join(self.method_dir, 'trajectories'), exist_ok=True)
@@ -80,6 +86,8 @@ class OutputManager:
     def _get_ai_method_suffix(self) -> str:
         """获取 AI 方法的简短后缀"""
         suffix_map = {
+            'gpr': 'gpr',
+            'gradient_predicting': 'gpr',
             'simple': 'gpr',
             'gradient': 'ggpr',
             'random_forest': 'rf',
