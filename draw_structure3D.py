@@ -19,7 +19,7 @@
         │   └── structures/
         │       ├── pyberny_initial.xyz
         │       └── pyberny_final.xyz
-        └── hybrid/
+        └── hybrid_{ai_method}/    # 如 hybrid_gpr, hybrid_krr 等
             └── structures/
                 ├── hybrid_ggpr_initial.xyz
                 └── hybrid_ggpr_final.xyz
@@ -61,7 +61,7 @@ def find_structures_dirs():
                 print(f"使用命令行参数指定的目录：{arg_path}")
                 return structures_dirs
             # 如果是 method 目录（pyberny/hybrid），查找其下的 structures
-            elif os.path.basename(arg_path) in ['pyberny', 'hybrid']:
+            elif os.path.basename(arg_path) == 'pyberny' or os.path.basename(arg_path).startswith('hybrid'):
                 structures_path = os.path.join(arg_path, 'structures')
                 if os.path.isdir(structures_path):
                     structures_dirs.append(structures_path)
@@ -69,15 +69,20 @@ def find_structures_dirs():
                     return structures_dirs
             # 如果是 smiles 目录，查找其下的所有 method/structures
             elif os.path.isdir(arg_path):
-                for method in ['pyberny', 'hybrid']:
-                    structures_path = os.path.join(arg_path, method, 'structures')
-                    if os.path.isdir(structures_path):
-                        structures_dirs.append(structures_path)
+                for method in os.listdir(arg_path):
+                    method_path = os.path.join(arg_path, method)
+                    if not os.path.isdir(method_path):
+                        continue
+                    # 匹配 pyberny 或 hybrid 开头的目录
+                    if method == 'pyberny' or method.startswith('hybrid'):
+                        structures_path = os.path.join(method_path, 'structures')
+                        if os.path.isdir(structures_path):
+                            structures_dirs.append(structures_path)
                 # 兼容旧结构
                 old_structures_path = os.path.join(arg_path, 'structures')
                 if os.path.isdir(old_structures_path) and old_structures_path not in structures_dirs:
                     structures_dirs.append(old_structures_path)
-                    
+
                 if structures_dirs:
                     print(f"在目录 {arg_path} 下找到 {len(structures_dirs)} 个 structures:")
                     for d in structures_dirs:
@@ -90,15 +95,20 @@ def find_structures_dirs():
                     if not os.path.isdir(smiles_path):
                         continue
                     # 新结构：output/{smiles}/{method}/structures
-                    for method in ['pyberny', 'hybrid']:
-                        structures_path = os.path.join(smiles_path, method, 'structures')
-                        if os.path.isdir(structures_path):
-                            structures_dirs.append(structures_path)
+                    for method in os.listdir(smiles_path):
+                        method_path = os.path.join(smiles_path, method)
+                        if not os.path.isdir(method_path):
+                            continue
+                        # 匹配 pyberny 或 hybrid 开头的目录
+                        if method == 'pyberny' or method.startswith('hybrid'):
+                            structures_path = os.path.join(method_path, 'structures')
+                            if os.path.isdir(structures_path):
+                                structures_dirs.append(structures_path)
                     # 兼容旧结构
                     old_structures_path = os.path.join(smiles_path, 'structures')
                     if os.path.isdir(old_structures_path) and old_structures_path not in structures_dirs:
                         structures_dirs.append(old_structures_path)
-                        
+
                 if structures_dirs:
                     print(f"在 output 目录下找到 {len(structures_dirs)} 个 structures 目录:")
                     for d in structures_dirs:
@@ -121,10 +131,16 @@ def find_structures_dirs():
                     continue
                     
                 # 新结构：output/{smiles}/{method}/structures
-                for method in ['pyberny', 'hybrid']:
-                    structures_path = os.path.join(smiles_path, method, 'structures')
-                    if os.path.isdir(structures_path):
-                        structures_dirs.append(structures_path)
+                # method 可以是 pyberny 或 hybrid_{ai_method}（如 hybrid_gpr）
+                for method in os.listdir(smiles_path):
+                    method_path = os.path.join(smiles_path, method)
+                    if not os.path.isdir(method_path):
+                        continue
+                    # 匹配 pyberny 或 hybrid 开头的目录
+                    if method == 'pyberny' or method.startswith('hybrid'):
+                        structures_path = os.path.join(method_path, 'structures')
+                        if os.path.isdir(structures_path):
+                            structures_dirs.append(structures_path)
                 
                 # 兼容旧结构：output/{smiles}/structures
                 old_structures_path = os.path.join(smiles_path, 'structures')
@@ -146,10 +162,16 @@ def find_structures_dirs():
                 continue
                 
             # 新结构：output/{smiles}/{method}/structures
-            for method in ['pyberny', 'hybrid']:
-                structures_path = os.path.join(smiles_path, method, 'structures')
-                if os.path.isdir(structures_path):
-                    structures_dirs.append(structures_path)
+            # method 可以是 pyberny 或 hybrid_{ai_method}（如 hybrid_gpr）
+            for method in os.listdir(smiles_path):
+                method_path = os.path.join(smiles_path, method)
+                if not os.path.isdir(method_path):
+                    continue
+                # 匹配 pyberny 或 hybrid 开头的目录
+                if method == 'pyberny' or method.startswith('hybrid'):
+                    structures_path = os.path.join(method_path, 'structures')
+                    if os.path.isdir(structures_path):
+                        structures_dirs.append(structures_path)
             
             # 兼容旧结构：output/{smiles}/structures
             old_structures_path = os.path.join(smiles_path, 'structures')
