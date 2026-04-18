@@ -70,7 +70,10 @@ pip install torch --index-url https://download.pytorch.org/whl/cu118
 
 ```bash
 # 方法 1: 纯 PyBerny 基准
+# 一次性优化
 python main.py --method pyberny --molecule ethanol
+# 使用与混合方法相同的多轮次优化
+python main.py --method pyberny --molecule ethanol --multi
 
 # 方法 2: PyBerny+AI 混合（推荐）
 python main.py --method hybrid --molecule ethanol --perturb 0.1
