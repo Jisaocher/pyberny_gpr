@@ -24,23 +24,7 @@
 | AI 方法 | 说明 | 状态 |
 |--------|------|------|
 | `gpr` | 梯度预测高斯过程回归 | ✅ 已实现（默认） |
-| `neural_network` | 神经网络 | 🔲 可扩展 |
-
----
-
-## PyBerny 说明
-
-**PyBerny** 基于 `berny` 库的完整 BFGS 实现：
-
-### PyBerny vs L-BFGS
-
-| 特性 | PyBerny | L-BFGS |
-|------|---------|--------|
-| 算法 | **完整 BFGS** | 有限内存 BFGS |
-| 坐标系统 | **冗余内坐标** | 笛卡尔坐标 |
-| 收敛速度 | 更快 | 较慢 |
-
-**注意**: 本项目使用 PyBerny (完整 BFGS)，不是 L-BFGS。
+| `nn` | 神经网络（能量 - 梯度联合预测） | ✅ 已实现（需安装 torch） |
 
 ---
 
@@ -55,7 +39,7 @@ pip install -U pyberny
 ### 2. 安装项目依赖
 
 ```bash
-cd /mnt/e/wsl_dir/pyberny_gpr
+cd ./pyberny_gpr
 pip install -r requirements.txt
 ```
 
@@ -74,6 +58,20 @@ pip install -r requirements.txt
 | `zhplot` | 中文字体支持 | 0.1.0 |
 | `py3Dmol` | 3D 分子可视化 | 2.0.0 |
 
+### 可选依赖（仅神经网络需要）
+
+**基础用户**（使用 PyBerny 或 GPR）无需安装 torch。
+
+**使用神经网络**需要安装 PyTorch：
+
+```bash
+# CPU 版本（推荐，快速安装）
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+# GPU 版本（需要 CUDA）
+pip install torch --index-url https://download.pytorch.org/whl/cu118
+```
+
 ---
 
 ## 快速开始
@@ -81,11 +79,34 @@ pip install -r requirements.txt
 ### 方法 1: 纯 PyBerny 基准
 
 ```bash
-# 乙醇分子，无扰动
+# 乙醇分子，无扰动（原始单次优化）
 python main.py --method pyberny --molecule ethanol
 
-# 添加扰动
+# 添加扰动（原始单次优化）
 python main.py --method pyberny --molecule ethanol --perturb 0.1
+
+# 多起点策略（模拟混合方法的起点更新操作），传入--multi
+# 第一轮：n_init+outer_steps 步，后续每轮：outer_steps 步
+# 每轮终点作为下一轮起点，从缓存读取能量/梯度（不额外计算）
+python main.py --method pyberny --molecule ethanol --perturb 0.1 --multi
+```
+
+**多起点策略说明**：
+
+| 参数 | 说明 |
+|------|------|
+| `--multi` | 启用多起点策略（默认 `false` = 原始单次优化） |
+| 第一轮步数 | `n_init + outer_steps`（默认 5+10=15 步） |
+| 后续轮步数 | `outer_steps`（默认 10 步） |
+| 缓存机制 | 每轮终点作为下一轮起点，从缓存读取能量/梯度 |
+| 计数对齐 | 累计真实 PySCF 调用次数，与混合策略对齐 |
+| 去重处理 | 避免起点/终点重复记录到迭代图中 |
+
+**配置参数**（在 `config/default_config.yaml` 中）：
+
+```yaml
+berny:
+  multi_start: false       # 默认 false=原始单次优化，true=多轮策略
 ```
 
 ### 方法 2: PyBerny+AI 混合（推荐）⭐
@@ -96,6 +117,9 @@ python main.py --method hybrid --molecule ethanol --perturb 0.1
 
 # 显式指定 AI 方法为 GPR
 python main.py --method hybrid --molecule ethanol --perturb 0.1 --ai_method gpr
+
+# 使用神经网络（需要先安装 torch）
+python main.py --method hybrid --molecule ethanol --perturb 0.1 --ai_method nn
 
 # 自定义参数
 python main.py --method hybrid --molecule ethanol --perturb 0.1 --max-iter 200
@@ -131,9 +155,11 @@ python main.py --xyz_path ./config/initial_xyz/CCCC_initial.xyz --xyz_name my_CC
 | `--xyz_path` | .xyz 文件路径 | `None` | 否 |
 | `--xyz_name` | 输出目录命名 | `None` | 否 |
 | `--ai_method` | AI 方法（仅 hybrid 模式） | `gpr` | 否 |
+| `--multi` | 多起点策略（仅 pyberny 模式） | `false` | 否 |
 
 **注意**:
 - `--ai_method` 仅在 `--method hybrid` 时使用
+- `--multi` 仅在 `--method pyberny` 时使用
 - 若未指定 `--ai_method`，则使用 config 中的默认值（`hybrid.ai_method`）
 - `--xyz_path` 和 `--xyz_name` 必须同时设置或同时为空，否则将抛出异常
 
@@ -189,7 +215,7 @@ optimizer:
 ```yaml
 hybrid:
   # AI 方法选择（支持多种 AI 方法）
-  ai_method: "gpr"           # AI 方法类型：gpr, 可扩展其他方法
+  ai_method: "gpr"           # AI 方法类型：gpr, nn
                             # 仅当 --method 为 hybrid 时使用
                             # 若命令行未指定 --ai_method，则使用此默认值
 
@@ -221,6 +247,9 @@ hybrid:
     max_rounds: 50           # 最大优化轮数
     max_no_improvement: 50   # 无改进早停轮数
     no_improvement_threshold: 1.0e-6  # 无改进判定阈值
+
+  # GPR 训练数据管理（两级筛选）
+  max_outer_iterations: 15   # 时间窗口大小
 ```
 
 ### AI 模型设置（GPR）
@@ -247,9 +276,44 @@ berny:
   gradient_threshold: 1e-4   # 梯度收敛阈值 (Hartree/Å)
   displacement_threshold: 1e-3  # 位移收敛阈值 (Å)
   debug: false               # 调试模式
+  multi_start: false         # 多起点策略（默认 false=原始单次优化）
+                             # true=多轮策略，模拟混合方法起点更新
+                             # 第一轮：n_init+outer_steps 步，后续每轮：outer_steps 步
 ```
 
-**注意**: 混合方法的外层优化直接使用 `berny` 配置，确保与基准方法参数一致。
+**注意**:
+- 混合方法的外层优化直接使用 `berny` 配置，确保与基准方法参数一致
+- `multi_start` 仅在 `--method pyberny` 时有效，用于还原混合方法的起点更新操作
+
+### 神经网络配置（当 ai_method="nn" 时使用）
+
+```yaml
+neural_network:
+  # 网络结构
+  hidden_layers: [128, 64, 32]    # 隐藏层神经元数
+  activation: "relu"              # 激活函数：relu, tanh, gelu, elu
+  use_batchnorm: true             # 是否使用批归一化
+  dropout_rate: 0.1               # Dropout 比率
+
+  # 训练参数
+  learning_rate: 0.001            # 学习率
+  batch_size: 16                  # 批次大小
+  max_epochs: 500                 # 最大训练轮数
+  early_stopping_patience: 50     # 早停耐心值
+  validation_split: 0.2           # 验证集比例
+
+  # 损失函数权重
+  energy_weight: 1.0              # 能量损失权重
+  gradient_weight: 0.1            # 梯度损失权重（梯度惩罚）
+
+  # 优化器
+  optimizer: "adam"               # 优化器：adam, adamw, sgd
+  weight_decay: 0.01              # 权重衰减（L2 正则化）
+
+  # 数据归一化
+  normalize_input: true           # 输入归一化
+  normalize_output: true          # 输出归一化
+```
 
 ---
 
@@ -289,7 +353,7 @@ output/
 │   │       ├── hybrid_gpr_final.xyz
 │   │       └── hybrid_gpr_final.html
 │
-│   └── hybrid_{ai_method}/       # 混合策略（其他 AI 方法，可扩展）
+│   └── hybrid_nn/                # 混合策略（神经网络 AI 方法）
 │       └── ...
 ```
 
@@ -306,19 +370,76 @@ output/
 | `structures/*.html` | 3D 交互式分子结构（py3Dmol） |
 | `plots/*.png` | 能量/梯度收敛曲线图 |
 
+### JSON 输出结构示例
+
+```json
+{
+  "metadata": {
+    "method": "hybrid",
+    "molecule": "ethanol",
+    "smiles": "CCO",
+    "n_atoms": 9,
+    "config": {...}
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "energy": -154.0803123456,
+      "gradient_norm": 0.123456,
+      "coords": [...],
+      "gradient": [...],
+      "displacement": [...],
+      "round_num": 1,
+      "stage": "outer"
+    }
+  ],
+  "statistics": {
+    "total_iterations": 25,
+    "initial_energy": -154.0803123456,
+    "final_energy": -154.0927654321,
+    "best_energy": -154.0927654321,
+    "energy_improvement": 0.0124530865,
+    "initial_gradient_norm": 0.123456,
+    "final_gradient_norm": 0.000098,
+    "best_gradient_norm": 0.000098,
+    "converged": true,
+    "computation_time": 123.45
+  }
+}
+```
+
 ---
 
 ## 3D 分子结构可视化
 
 ```bash
+python draw_structure3D.py [path]
+```
+
+**参数**:
+- `path`: 可选，指定要处理的目录
+  - 如果是 `structures` 目录，直接处理该目录
+  - 如果是其他目录，递归查找其下所有 `structures` 目录
+  - 默认为 `./output`
+
+**示例**:
+```bash
+# 处理 ./output 下所有 structures 目录
 python draw_structure3D.py
+
+# 处理指定分子目录
+python draw_structure3D.py output/CCO_0.01
+
+# 处理指定 structures 目录
+python draw_structure3D.py path/to/structures
 ```
 
 **功能**:
+- 递归查找指定目录下所有 `structures` 目录
 - 批量生成 HTML 格式 3D 分子结构
 - 球棍模型，支持旋转/缩放/平移
-- 自动查找 `output/structures` 目录
-- 支持中文标签
+- 兼容任意目录结构，无命名格式限制
+- 每个 `.xyz` 文件生成对应的 `.html` 文件
 
 ---
 
@@ -456,6 +577,18 @@ print(f"总迭代次数：{len(history.iterations)}")
 | 大分子（>50 原子） | 考虑扩展 `neural_network` |
 | 高精度需求 | `gpr` + 小 `local_radius` |
 
+### Q5: 神经网络方法不可用？
+
+**问题**: 使用 `--ai_method nn` 时提示需要安装 torch。
+
+**解决方案**:
+```bash
+# 安装 PyTorch（CPU 版本推荐）
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+```
+
+**注意**: 无 torch 环境下，`--method pyberny` 和 `--method hybrid --ai_method gpr` 仍可正常工作。
+
 ---
 
 ## 性能基准
@@ -469,48 +602,6 @@ print(f"总迭代次数：{len(history.iterations)}")
 | Hybrid-GPR (扰动 0.5) | -153.0956 | -153.9109 | ~25 | ~20 |
 
 **说明**: Hybrid-GPR 通过内层 AI 探索减少真实 PySCF 调用次数，从而节省计算成本。
-
----
-
-## 输出文件示例
-
-### JSON 输出结构
-
-```json
-{
-  "metadata": {
-    "method": "hybrid",
-    "molecule": "ethanol",
-    "smiles": "CCO",
-    "n_atoms": 9,
-    "config": {...}
-  },
-  "iterations": [
-    {
-      "iteration": 1,
-      "energy": -154.0803123456,
-      "gradient_norm": 0.123456,
-      "coords": [...],
-      "gradient": [...],
-      "displacement": [...],
-      "round_num": 1,
-      "stage": "outer"
-    }
-  ],
-  "statistics": {
-    "total_iterations": 25,
-    "initial_energy": -154.0803123456,
-    "final_energy": -154.0927654321,
-    "best_energy": -154.0927654321,
-    "energy_improvement": 0.0124530865,
-    "initial_gradient_norm": 0.123456,
-    "final_gradient_norm": 0.000098,
-    "best_gradient_norm": 0.000098,
-    "converged": true,
-    "computation_time": 123.45
-  }
-}
-```
 
 ---
 

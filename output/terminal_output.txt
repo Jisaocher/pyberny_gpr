@@ -1,0 +1,1597 @@
+项目运行时terminal实际输出示例
+(gpr_env) liuzhe@tianxuan:/mnt/e/wsl_dir/pyberny_gpr$ python main.py --method pyberny --smiles CCO --perturb 0.01 --multi
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.16.5 and <1.23.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/berny/species_data.py:6: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_string
+
+======================================================================
+PyBerny-GPR 混合优化项目
+======================================================================
+分子：CCO
+扰动：0.01 Å
+种子：42
+方法：pyberny
+输出目录：./output/CCO_0.01/pyberny_multi
+======================================================================
+
+初始结构:
+  原子数：9
+  自由度：27
+分子结构已保存：./output/CCO_0.01/pyberny_multi/structures/pyberny_initial.xyz
+
+======================================================================
+运行优化：PYBERNY
+======================================================================
+======================================================================
+PyBerny 基准优化开始（多起点策略）
+第一轮：15 步，后续每轮：10 步
+======================================================================
+原子数：9
+自由度：27
+收敛阈值：能量=1e-06, 梯度=0.0001, 位移=0.001
+======================================================================
+
+======================================================================
+第 1 轮优化
+======================================================================
+本轮起点：E=-154.07911335, |g|=0.157325
+[PyBerny] 执行 15 步...
+Iter    0: Energy = -154.0791133506 Hartree, |grad| = 0.157325
+Iter    1: Energy = -154.0833144004 Hartree, |grad| = 0.098060, disp=0.261007
+Iter    2: Energy = -154.0856508374 Hartree, |grad| = 0.021381, disp=0.126033
+Iter    3: Energy = -154.0861121244 Hartree, |grad| = 0.013383, disp=0.081382
+Iter    4: Energy = -154.0865808196 Hartree, |grad| = 0.010300, disp=0.067765
+Iter    5: Energy = -154.0870707717 Hartree, |grad| = 0.011239, disp=0.065866
+Iter    6: Energy = -154.0875718449 Hartree, |grad| = 0.011859, disp=0.067179
+Iter    7: Energy = -154.0880625169 Hartree, |grad| = 0.014287, disp=0.066430
+Iter    8: Energy = -154.0882732854 Hartree, |grad| = 0.034671, disp=0.092977
+Iter    9: Energy = -154.0884836242 Hartree, |grad| = 0.013220, disp=0.041737
+Iter   10: Energy = -154.0886174486 Hartree, |grad| = 0.010542, disp=0.015858
+Iter   11: Energy = -154.0887623753 Hartree, |grad| = 0.010155, disp=0.018307
+Iter   12: Energy = -154.0889023150 Hartree, |grad| = 0.009333, disp=0.018864
+Iter   13: Energy = -154.0890373623 Hartree, |grad| = 0.009334, disp=0.018529
+Iter   14: Energy = -154.0891704681 Hartree, |grad| = 0.009320, disp=0.017665
+本轮终点：E=-154.08917047, |g|=0.009320
+本轮 PySCF 调用次数：14
+
+======================================================================
+第 2 轮优化
+======================================================================
+本轮起点：E=-154.08917047, |g|=0.009320
+[PyBerny] 执行 10 步...
+Iter    0: Energy = -154.0891704681 Hartree, |grad| = 0.009320
+Iter    1: Energy = -154.0901885288 Hartree, |grad| = 0.010221, disp=0.137690
+Iter    2: Energy = -154.0911043673 Hartree, |grad| = 0.008797, disp=0.131029
+Iter    3: Energy = -154.0918535589 Hartree, |grad| = 0.008854, disp=0.132282
+Iter    4: Energy = -154.0923821588 Hartree, |grad| = 0.006453, disp=0.121632
+Iter    5: Energy = -154.0926150452 Hartree, |grad| = 0.011451, disp=0.139065
+Iter    6: Energy = -154.0926773582 Hartree, |grad| = 0.007819, disp=0.077162
+Iter    7: Energy = -154.0927104308 Hartree, |grad| = 0.004301, disp=0.023906
+Iter    8: Energy = -154.0927166341 Hartree, |grad| = 0.002128, disp=0.012339
+Iter    9: Energy = -154.0927189881 Hartree, |grad| = 0.000924, disp=0.006318
+本轮终点：E=-154.09271899, |g|=0.000924
+本轮 PySCF 调用次数：9
+
+======================================================================
+第 3 轮优化
+======================================================================
+本轮起点：E=-154.09271899, |g|=0.000924
+[PyBerny] 执行 10 步...
+Iter    0: Energy = -154.0927189881 Hartree, |grad| = 0.000924
+Iter    1: Energy = -154.0927187390 Hartree, |grad| = 0.001232, disp=0.002840
+Iter    2: Energy = -154.0927193272 Hartree, |grad| = 0.000202, disp=0.001859
+Iter    3: Energy = -154.0927193307 Hartree, |grad| = 0.000205, disp=0.000817
+Iter    4: Energy = -154.0927193485 Hartree, |grad| = 0.000072, disp=0.000507
+收敛！梯度范数：0.000072 < 0.0001
+本轮终点：E=-154.09271935, |g|=0.000072
+本轮 PySCF 调用次数：4
+berny 提前终止（已收敛）
+
+✓ 收敛！berny 提前终止，最终梯度范数：0.000072
+======================================================================
+优化完成！
+最终能量：-154.0927193485 Hartree
+最终梯度范数：0.000072
+迭代次数：28
+收敛状态：是
+计算时间：58.05 秒
+能量/梯度调用次数：28
+======================================================================
+优化历史已保存：./output/CCO_0.01/pyberny_multi/pyberny_20260418_155723.json
+优化轨迹已保存：./output/CCO_0.01/pyberny_multi/trajectories/pyberny_trajectory_20260418_155723.xyz
+详细迭代信息已保存：./output/CCO_0.01/pyberny_multi/pyberny_details_20260418_155723.json
+分子结构已保存：./output/CCO_0.01/pyberny_multi/structures/pyberny_final.xyz
+
+======================================================================
+优化结果
+======================================================================
+方法：pyberny
+收敛：True
+初始能量：-154.0791133506 Hartree
+最终能量：-154.0927193485 Hartree
+最终梯度：0.000072 Hartree/Å
+总迭代次数：28
+======================================================================
+(gpr_env) liuzhe@tianxuan:/mnt/e/wsl_dir/pyberny_gpr$ python main.py --method hybrid --smiles CCO --perturb 0.01 --multi
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.16.5 and <1.23.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/berny/species_data.py:6: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_string
+
+======================================================================
+PyBerny-GPR 混合优化项目
+======================================================================
+分子：CCO
+扰动：0.01 Å
+种子：42
+方法：hybrid
+AI 方法：gpr
+输出目录：./output/CCO_0.01/hybrid_gpr
+======================================================================
+
+初始结构:
+  原子数：9
+  自由度：27
+分子结构已保存：./output/CCO_0.01/hybrid_gpr/structures/hybrid_gpr_initial.xyz
+
+======================================================================
+运行优化：HYBRID
+======================================================================
+使用 AI 方法：GPR (梯度预测)
+======================================================================
+PyBerny-GPR 混合优化开始
+======================================================================
+外层步数：10（第 1 轮：15 步）
+内层步数：5
+验证频率：0（0=仅验证最后一点）
+预测误差阈值：0.001
+初始能量：-154.0791133506 Hartree
+======================================================================
+
+======================================================================
+第 1 轮优化
+======================================================================
+本轮起点：E=-154.07911335, |g|=0.157325
+
+[外层 PyBerny] 执行 15 步...
+Iter    0: Energy = -154.0791133506 Hartree, |grad| = 0.157325, disp=0.000000
+Iter    1: Energy = -154.0833144004 Hartree, |grad| = 0.098060, disp=0.261007
+Iter    2: Energy = -154.0856508374 Hartree, |grad| = 0.021381, disp=0.126033
+Iter    3: Energy = -154.0861121244 Hartree, |grad| = 0.013383, disp=0.081382
+Iter    4: Energy = -154.0865808196 Hartree, |grad| = 0.010300, disp=0.067765
+Iter    5: Energy = -154.0870707717 Hartree, |grad| = 0.011239, disp=0.065866
+Iter    6: Energy = -154.0875718449 Hartree, |grad| = 0.011859, disp=0.067179
+Iter    7: Energy = -154.0880625169 Hartree, |grad| = 0.014287, disp=0.066430
+Iter    8: Energy = -154.0882732854 Hartree, |grad| = 0.034671, disp=0.092977
+Iter    9: Energy = -154.0884836242 Hartree, |grad| = 0.013220, disp=0.041737
+Iter   10: Energy = -154.0886174486 Hartree, |grad| = 0.010542, disp=0.015858
+Iter   11: Energy = -154.0887623753 Hartree, |grad| = 0.010155, disp=0.018307
+Iter   12: Energy = -154.0889023150 Hartree, |grad| = 0.009333, disp=0.018864
+Iter   13: Energy = -154.0890373623 Hartree, |grad| = 0.009334, disp=0.018529
+Iter   14: Energy = -154.0891704681 Hartree, |grad| = 0.009320, disp=0.017665
+外层完成 15 步
+外层终点：E=-154.08917047, |g|=0.009320
+外层 PyBerny 完成 15 步
+训练数据：按梯度范数筛选保留 10 点
+GPR 模型训练完成，使用 10 个训练点
+
+[内层探索] 执行 5 步（AI 预测梯度，梯度下降法）...
+内层起点：E=-154.08917047, |g|=0.009320
+  Step 1: |g_pred|=0.009303, step=0.051515, d=0.000479
+  Step 2: |g_pred|=0.009304, step=0.051519, d=0.000479
+  Step 3: |g_pred|=0.009305, step=0.051523, d=0.000479
+  Step 4: |g_pred|=0.009305, step=0.051527, d=0.000479
+  Step 5: |g_pred|=0.009306, step=0.051531, d=0.000480
+内层终点：E_true=-154.08919200, |g_true|=0.008951
+内层实际执行：5 步 / 设置 5 步
+验证状态：完成
+
+择优结果：
+    outer_final: E=-154.08917047, |g|=0.009320, score=-0.658552
+  ✓ inner_final: E=-154.08919200, |g|=0.008951, score=-0.660193
+
+本轮最佳：inner_final
+下一轮起点：E=-154.08919200, |g|=0.008951
+
+======================================================================
+第 2 轮优化
+======================================================================
+本轮起点：E=-154.08919200, |g|=0.008951
+
+[外层 PyBerny] 执行 10 步...
+Iter    0: Energy = -154.0891919982 Hartree, |grad| = 0.008951, disp=0.000000
+Iter    1: Energy = -154.0902079950 Hartree, |grad| = 0.010824, disp=0.139357
+Iter    2: Energy = -154.0911186270 Hartree, |grad| = 0.008106, disp=0.129137
+Iter    3: Energy = -154.0918597688 Hartree, |grad| = 0.009307, disp=0.135806
+Iter    4: Energy = -154.0923753782 Hartree, |grad| = 0.008590, disp=0.121681
+Iter    5: Energy = -154.0926355786 Hartree, |grad| = 0.009772, disp=0.132564
+Iter    6: Energy = -154.0927012887 Hartree, |grad| = 0.006481, disp=0.068192
+Iter    7: Energy = -154.0927155458 Hartree, |grad| = 0.003106, disp=0.015219
+Iter    8: Energy = -154.0927181387 Hartree, |grad| = 0.001408, disp=0.007846
+Iter    9: Energy = -154.0927191792 Hartree, |grad| = 0.000683, disp=0.003592
+外层完成 10 步
+外层终点：E=-154.09271918, |g|=0.000683
+外层 PyBerny 完成 10 步
+训练数据：按梯度范数筛选保留 10 点
+GPR 模型训练完成，使用 10 个训练点
+
+[内层探索] 执行 5 步（AI 预测梯度，梯度下降法）...
+内层起点：E=-154.09271918, |g|=0.000683
+  Step 1: |g_pred|=0.000432, step=0.007161, d=0.000003
+  Step 2: |g_pred|=0.000432, step=0.007161, d=0.000003
+  Step 3: |g_pred|=0.000432, step=0.007160, d=0.000003
+  Step 4: |g_pred|=0.000432, step=0.007159, d=0.000003
+  Step 5: |g_pred|=0.000432, step=0.007158, d=0.000003
+内层终点：E_true=-154.09271918, |g_true|=0.000655
+内层实际执行：5 步 / 设置 5 步
+验证状态：完成
+
+择优结果：
+    outer_final: E=-154.09271918, |g|=0.000683, score=-0.646598
+  ✓ inner_final: E=-154.09271918, |g|=0.000655, score=-0.648790
+
+本轮最佳：inner_final
+下一轮起点：E=-154.09271918, |g|=0.000655
+
+======================================================================
+第 3 轮优化
+======================================================================
+本轮起点：E=-154.09271918, |g|=0.000655
+
+[外层 PyBerny] 执行 10 步...
+Iter    0: Energy = -154.0927191845 Hartree, |grad| = 0.000655, disp=0.000000
+外层完成 1 步
+外层终点：E=-154.09271918, |g|=0.000655
+⚠ 外层 PyBerny 提前终止（实际 1 步 < 设置 10 步）
+  原因：PyBerny L-BFGS 已满足收敛条件
+
+外层 L-BFGS 已收敛，跳过内层探索
+最终结果：E=-154.09271918, |g|=0.000655
+
+======================================================================
+优化完成！
+======================================================================
+最优能量（全局梯度最小）：-154.0927191792 Hartree
+最优梯度范数：0.000432
+最优迭代：5
+总迭代次数：36
+总轮数：3
+收敛状态：收敛
+计算时间：53.76 秒
+AI 模型训练点数：10
+PySCF 调用次数：26 (外层：24, 内层验证：2)
+内层探索步数：15（使用 AI 预测，节省 PySCF 计算）
+======================================================================
+优化历史已保存：./output/CCO_0.01/hybrid_gpr/hybrid_gpr_20260418_160007.json
+优化轨迹已保存：./output/CCO_0.01/hybrid_gpr/trajectories/hybrid_gpr_trajectory_20260418_160007.xyz
+详细迭代信息已保存：./output/CCO_0.01/hybrid_gpr/hybrid_gpr_details_20260418_160007.json
+分子结构已保存：./output/CCO_0.01/hybrid_gpr/structures/hybrid_gpr_final.xyz
+
+======================================================================
+优化结果
+======================================================================
+方法：hybrid
+收敛：True
+初始能量：-154.0791133506 Hartree
+最终能量：-154.0927191845 Hartree
+最终梯度：0.000655 Hartree/Å
+总迭代次数：36
+======================================================================
+(gpr_env) liuzhe@tianxuan:/mnt/e/wsl_dir/pyberny_gpr$ python main.py --method hybrid --smiles CCO --perturb 0.01 --ai_method nn
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.16.5 and <1.23.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/berny/species_data.py:6: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_string
+
+======================================================================
+PyBerny-GPR 混合优化项目
+======================================================================
+分子：CCO
+扰动：0.01 Å
+种子：42
+方法：hybrid
+AI 方法：nn
+输出目录：./output/CCO_0.01/hybrid_nn
+======================================================================
+
+初始结构:
+  原子数：9
+  自由度：27
+分子结构已保存：./output/CCO_0.01/hybrid_nn/structures/hybrid_nn_initial.xyz
+
+======================================================================
+运行优化：HYBRID
+======================================================================
+使用 AI 方法：Neural Network (能量 - 梯度联合预测)
+======================================================================
+PyBerny-Neural Network 混合优化开始
+======================================================================
+外层步数：10（第 1 轮：15 步）
+内层步数：5
+验证频率：0（0=仅验证最后一点）
+预测误差阈值：0.001
+初始能量：-154.0791133506 Hartree
+======================================================================
+
+======================================================================
+第 1 轮优化
+======================================================================
+本轮起点：E=-154.07911335, |g|=0.157325
+
+[外层 PyBerny] 执行 15 步...
+Iter    0: Energy = -154.0791133506 Hartree, |grad| = 0.157325, disp=0.000000
+Iter    1: Energy = -154.0833144004 Hartree, |grad| = 0.098060, disp=0.261007
+Iter    2: Energy = -154.0856508374 Hartree, |grad| = 0.021381, disp=0.126033
+Iter    3: Energy = -154.0861121244 Hartree, |grad| = 0.013383, disp=0.081382
+Iter    4: Energy = -154.0865808196 Hartree, |grad| = 0.010300, disp=0.067765
+Iter    5: Energy = -154.0870707717 Hartree, |grad| = 0.011239, disp=0.065866
+Iter    6: Energy = -154.0875718449 Hartree, |grad| = 0.011859, disp=0.067179
+Iter    7: Energy = -154.0880625169 Hartree, |grad| = 0.014287, disp=0.066430
+Iter    8: Energy = -154.0882732854 Hartree, |grad| = 0.034671, disp=0.092977
+Iter    9: Energy = -154.0884836242 Hartree, |grad| = 0.013220, disp=0.041737
+Iter   10: Energy = -154.0886174486 Hartree, |grad| = 0.010542, disp=0.015858
+Iter   11: Energy = -154.0887623753 Hartree, |grad| = 0.010155, disp=0.018307
+Iter   12: Energy = -154.0889023150 Hartree, |grad| = 0.009333, disp=0.018864
+Iter   13: Energy = -154.0890373623 Hartree, |grad| = 0.009334, disp=0.018529
+Iter   14: Energy = -154.0891704681 Hartree, |grad| = 0.009320, disp=0.017665
+外层完成 15 步
+外层终点：E=-154.08917047, |g|=0.009320
+外层 PyBerny 完成 15 步
+训练数据：按梯度范数筛选保留 10 点
+NN 模型训练完成，使用 10 个训练点，最佳验证损失：0.117393
+
+[内层探索] 执行 5 步（AI 预测梯度，梯度下降法）...
+内层起点：E=-154.08917047, |g|=0.009320
+  Step 1: |g_pred|=0.008906, step=0.049529, d=0.000441
+  Step 2: |g_pred|=0.008910, step=0.049548, d=0.000441
+  Step 3: |g_pred|=0.008913, step=0.049567, d=0.000442
+  Step 4: |g_pred|=0.008917, step=0.049586, d=0.000442
+  Step 5: |g_pred|=0.008921, step=0.049603, d=0.000442
+内层终点：E_true=-154.08918988, |g_true|=0.009037
+内层实际执行：5 步 / 设置 5 步
+验证状态：完成
+
+择优结果：
+    outer_final: E=-154.08917047, |g|=0.009320, score=-0.658552
+  ✓ inner_final: E=-154.08918988, |g|=0.009037, score=-0.659809
+
+本轮最佳：inner_final
+下一轮起点：E=-154.08918988, |g|=0.009037
+
+======================================================================
+第 2 轮优化
+======================================================================
+本轮起点：E=-154.08918988, |g|=0.009037
+
+[外层 PyBerny] 执行 10 步...
+Iter    0: Energy = -154.0891898843 Hartree, |grad| = 0.009037, disp=0.000000
+Iter    1: Energy = -154.0902069577 Hartree, |grad| = 0.010604, disp=0.138952
+Iter    2: Energy = -154.0911169252 Hartree, |grad| = 0.008052, disp=0.129288
+Iter    3: Energy = -154.0918548508 Hartree, |grad| = 0.009801, disp=0.136677
+Iter    4: Energy = -154.0923799942 Hartree, |grad| = 0.007706, disp=0.121062
+Iter    5: Energy = -154.0926322515 Hartree, |grad| = 0.010300, disp=0.131748
+Iter    6: Energy = -154.0926963204 Hartree, |grad| = 0.006592, disp=0.072471
+Iter    7: Energy = -154.0927162406 Hartree, |grad| = 0.002066, disp=0.018708
+Iter    8: Energy = -154.0927183626 Hartree, |grad| = 0.001237, disp=0.007605
+Iter    9: Energy = -154.0927192267 Hartree, |grad| = 0.000440, disp=0.003474
+外层完成 10 步
+外层终点：E=-154.09271923, |g|=0.000440
+外层 PyBerny 完成 10 步
+训练数据：按梯度范数筛选保留 10 点
+NN 模型训练完成，使用 10 个训练点，最佳验证损失：0.119678
+
+[内层探索] 执行 5 步（AI 预测梯度，梯度下降法）...
+内层起点：E=-154.09271923, |g|=0.000440
+  Step 1: |g_pred|=0.003216, step=0.021082, d=0.000068
+  Step 2: |g_pred|=0.003214, step=0.021072, d=0.000068
+  Step 3: |g_pred|=0.003212, step=0.021062, d=0.000068
+  Step 4: |g_pred|=0.003211, step=0.021053, d=0.000068
+  Step 5: |g_pred|=0.003209, step=0.021043, d=0.000068
+内层终点：E_true=-154.09271920, |g_true|=0.000550
+内层实际执行：5 步 / 设置 5 步
+验证状态：完成
+
+择优结果：
+  ✓ outer_final: E=-154.09271923, |g|=0.000440, score=-0.665963
+    inner_final: E=-154.09271920, |g|=0.000550, score=-0.657389
+
+本轮最佳：outer_final
+下一轮起点：E=-154.09271923, |g|=0.000440
+
+======================================================================
+第 3 轮优化
+======================================================================
+本轮起点：E=-154.09271923, |g|=0.000440
+
+[外层 PyBerny] 执行 10 步...
+Iter    0: Energy = -154.0927192267 Hartree, |grad| = 0.000440, disp=0.000000
+外层完成 1 步
+外层终点：E=-154.09271923, |g|=0.000440
+⚠ 外层 PyBerny 提前终止（实际 1 步 < 设置 10 步）
+  原因：PyBerny L-BFGS 已满足收敛条件
+
+外层 L-BFGS 已收敛，跳过内层探索
+最终结果：E=-154.09271923, |g|=0.000440
+
+======================================================================
+优化完成！
+======================================================================
+最优能量（全局梯度最小）：-154.0927192267 Hartree
+最优梯度范数：0.000440
+最优迭代：9
+总迭代次数：36
+总轮数：3
+收敛状态：收敛
+计算时间：51.16 秒
+AI 模型训练点数：10
+PySCF 调用次数：26 (外层：24, 内层验证：2)
+内层探索步数：15（使用 AI 预测，节省 PySCF 计算）
+======================================================================
+优化历史已保存：./output/CCO_0.01/hybrid_nn/hybrid_nn_20260418_160933.json
+优化轨迹已保存：./output/CCO_0.01/hybrid_nn/trajectories/hybrid_nn_trajectory_20260418_160933.xyz
+详细迭代信息已保存：./output/CCO_0.01/hybrid_nn/hybrid_nn_details_20260418_160933.json
+分子结构已保存：./output/CCO_0.01/hybrid_nn/structures/hybrid_nn_final.xyz
+
+======================================================================
+优化结果
+======================================================================
+方法：hybrid
+收敛：True
+初始能量：-154.0791133506 Hartree
+最终能量：-154.0927192267 Hartree
+最终梯度：0.000440 Hartree/Å
+总迭代次数：36
+======================================================================
+(gpr_env) liuzhe@tianxuan:/mnt/e/wsl_dir/pyberny_gpr$ python main.py --method pyberny --smiles CCO --perturb 0.01 --ai_method nn
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.16.5 and <1.23.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/berny/species_data.py:6: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_string
+
+======================================================================
+PyBerny-GPR 混合优化项目
+======================================================================
+分子：CCO
+扰动：0.01 Å
+种子：42
+方法：pyberny
+输出目录：./output/CCO_0.01/pyberny
+======================================================================
+
+初始结构:
+  原子数：9
+  自由度：27
+分子结构已保存：./output/CCO_0.01/pyberny/structures/pyberny_initial.xyz
+
+======================================================================
+运行优化：PYBERNY
+======================================================================
+======================================================================
+PyBerny 基准优化开始（完整 BFGS，一次性运行）
+======================================================================
+原子数：9
+自由度：27
+最大步数：500
+Trust Radius: 0.3 Å
+收敛阈值：能量=1e-06, 梯度=0.0001, 位移=0.001
+======================================================================
+初始能量：-154.0791133506 Hartree
+初始梯度范数：0.157325
+Iter    0: Energy = -154.0791133506 Hartree, |grad| = 0.157325, disp=0.000000
+Iter    1: Energy = -154.0833144004 Hartree, |grad| = 0.098060, disp=0.261007
+Iter    2: Energy = -154.0856508374 Hartree, |grad| = 0.021381, disp=0.126033
+Iter    3: Energy = -154.0861121244 Hartree, |grad| = 0.013383, disp=0.081382
+Iter    4: Energy = -154.0865808196 Hartree, |grad| = 0.010300, disp=0.067765
+Iter    5: Energy = -154.0870707717 Hartree, |grad| = 0.011239, disp=0.065866
+Iter    6: Energy = -154.0875718449 Hartree, |grad| = 0.011859, disp=0.067179
+Iter    7: Energy = -154.0880625169 Hartree, |grad| = 0.014287, disp=0.066430
+Iter    8: Energy = -154.0882732854 Hartree, |grad| = 0.034671, disp=0.092977
+Iter    9: Energy = -154.0884836242 Hartree, |grad| = 0.013220, disp=0.041737
+Iter   10: Energy = -154.0886174486 Hartree, |grad| = 0.010542, disp=0.015858
+Iter   11: Energy = -154.0887623753 Hartree, |grad| = 0.010155, disp=0.018307
+Iter   12: Energy = -154.0889023150 Hartree, |grad| = 0.009333, disp=0.018864
+Iter   13: Energy = -154.0890373623 Hartree, |grad| = 0.009334, disp=0.018529
+Iter   14: Energy = -154.0891704681 Hartree, |grad| = 0.009320, disp=0.017665
+Iter   15: Energy = -154.0893025247 Hartree, |grad| = 0.009341, disp=0.017397
+Iter   16: Energy = -154.0894336839 Hartree, |grad| = 0.009329, disp=0.017094
+Iter   17: Energy = -154.0895639215 Hartree, |grad| = 0.009298, disp=0.017136
+Iter   18: Energy = -154.0896931015 Hartree, |grad| = 0.009259, disp=0.016827
+Iter   19: Energy = -154.0898211419 Hartree, |grad| = 0.009203, disp=0.017077
+Iter   20: Energy = -154.0899478891 Hartree, |grad| = 0.009133, disp=0.016624
+Iter   21: Energy = -154.0900732450 Hartree, |grad| = 0.009062, disp=0.017060
+Iter   22: Energy = -154.0901970723 Hartree, |grad| = 0.008964, disp=0.016487
+Iter   23: Energy = -154.0903192603 Hartree, |grad| = 0.008876, disp=0.016987
+Iter   24: Energy = -154.0904396846 Hartree, |grad| = 0.008758, disp=0.016431
+Iter   25: Energy = -154.0905582269 Hartree, |grad| = 0.008646, disp=0.016847
+Iter   26: Energy = -154.0906747690 Hartree, |grad| = 0.008517, disp=0.016424
+Iter   27: Energy = -154.0907891895 Hartree, |grad| = 0.008377, disp=0.016680
+Iter   28: Energy = -154.0909013728 Hartree, |grad| = 0.008237, disp=0.016418
+Iter   29: Energy = -154.0910111992 Hartree, |grad| = 0.008072, disp=0.016527
+Iter   30: Energy = -154.0911185561 Hartree, |grad| = 0.007917, disp=0.016385
+Iter   31: Energy = -154.0912233276 Hartree, |grad| = 0.007731, disp=0.016398
+Iter   32: Energy = -154.0913254036 Hartree, |grad| = 0.007558, disp=0.016329
+Iter   33: Energy = -154.0914246720 Hartree, |grad| = 0.007354, disp=0.016286
+Iter   34: Energy = -154.0915210246 Hartree, |grad| = 0.007158, disp=0.016257
+Iter   35: Energy = -154.0916143520 Hartree, |grad| = 0.006942, disp=0.016184
+Iter   36: Energy = -154.0917045460 Hartree, |grad| = 0.006717, disp=0.016179
+Iter   37: Energy = -154.0917914982 Hartree, |grad| = 0.006501, disp=0.016091
+Iter   38: Energy = -154.0918751068 Hartree, |grad| = 0.006233, disp=0.016096
+Iter   39: Energy = -154.0919552905 Hartree, |grad| = 0.006028, disp=0.016016
+Iter   40: Energy = -154.0920319738 Hartree, |grad| = 0.005718, disp=0.015983
+Iter   41: Energy = -154.0921050614 Hartree, |grad| = 0.005501, disp=0.015938
+Iter   42: Energy = -154.0921744480 Hartree, |grad| = 0.005180, disp=0.015849
+Iter   43: Energy = -154.0922400413 Hartree, |grad| = 0.004937, disp=0.015854
+Iter   44: Energy = -154.0923017538 Hartree, |grad| = 0.004607, disp=0.015731
+Iter   45: Energy = -154.0923595038 Hartree, |grad| = 0.004345, disp=0.015773
+Iter   46: Energy = -154.0924132115 Hartree, |grad| = 0.004000, disp=0.015614
+Iter   47: Energy = -154.0924628018 Hartree, |grad| = 0.003724, disp=0.015699
+Iter   48: Energy = -154.0925082022 Hartree, |grad| = 0.003362, disp=0.015487
+Iter   49: Energy = -154.0925493444 Hartree, |grad| = 0.003077, disp=0.015647
+Iter   50: Energy = -154.0925861622 Hartree, |grad| = 0.002698, disp=0.015329
+Iter   51: Energy = -154.0926185933 Hartree, |grad| = 0.002404, disp=0.015656
+Iter   52: Energy = -154.0926465737 Hartree, |grad| = 0.002015, disp=0.015089
+Iter   53: Energy = -154.0926700440 Hartree, |grad| = 0.001720, disp=0.015833
+Iter   54: Energy = -154.0926889609 Hartree, |grad| = 0.001362, disp=0.014751
+Iter   55: Energy = -154.0927033428 Hartree, |grad| = 0.001048, disp=0.016086
+Iter   56: Energy = -154.0927131615 Hartree, |grad| = 0.000744, disp=0.014734
+Iter   57: Energy = -154.0927183381 Hartree, |grad| = 0.000491, disp=0.015741
+Iter   58: Energy = -154.0927192497 Hartree, |grad| = 0.000417, disp=0.010577
+
+berny 已收敛（复合判据），最终梯度：0.000417
+======================================================================
+优化完成！
+最终能量：-154.0927192497 Hartree
+最终梯度范数：0.000417
+迭代次数：59
+收敛状态：是
+计算时间：122.87 秒
+能量/梯度调用次数：59
+======================================================================
+优化历史已保存：./output/CCO_0.01/pyberny/pyberny_20260418_161244.json
+优化轨迹已保存：./output/CCO_0.01/pyberny/trajectories/pyberny_trajectory_20260418_161244.xyz
+详细迭代信息已保存：./output/CCO_0.01/pyberny/pyberny_details_20260418_161244.json
+分子结构已保存：./output/CCO_0.01/pyberny/structures/pyberny_final.xyz
+
+======================================================================
+优化结果
+======================================================================
+方法：pyberny
+收敛：True
+初始能量：-154.0791133506 Hartree
+最终能量：-154.0927192497 Hartree
+最终梯度：0.000417 Hartree/Å
+总迭代次数：59
+======================================================================
+(gpr_env) liuzhe@tianxuan:/mnt/e/wsl_dir/pyberny_gpr$ python draw_structure3D.py 
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.16.5 and <1.23.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+使用配置文件定义的目录，找到 3 个 structures:
+  - ./output/CCO_0.01/hybrid_gpr/structures
+  - ./output/CCO_0.01/hybrid_nn/structures
+  - ./output/CCO_0.01/pyberny/structures
+
+处理目录：./output/CCO_0.01/hybrid_gpr/structures
+找到 2 个 XYZ 文件:
+  - hybrid_gpr_final.xyz
+  - hybrid_gpr_initial.xyz
+开始生成 HTML 文件...
+分子结构图已保存：./output/CCO_0.01/hybrid_gpr/structures/hybrid_gpr_final.html
+分子结构图已保存：./output/CCO_0.01/hybrid_gpr/structures/hybrid_gpr_initial.html
+完成！生成了 2 个 HTML 文件:
+  ✓ hybrid_gpr_final.html
+  ✓ hybrid_gpr_initial.html
+
+处理目录：./output/CCO_0.01/hybrid_nn/structures
+找到 2 个 XYZ 文件:
+  - hybrid_nn_final.xyz
+  - hybrid_nn_initial.xyz
+开始生成 HTML 文件...
+分子结构图已保存：./output/CCO_0.01/hybrid_nn/structures/hybrid_nn_final.html
+分子结构图已保存：./output/CCO_0.01/hybrid_nn/structures/hybrid_nn_initial.html
+完成！生成了 2 个 HTML 文件:
+  ✓ hybrid_nn_final.html
+  ✓ hybrid_nn_initial.html
+
+处理目录：./output/CCO_0.01/pyberny/structures
+找到 2 个 XYZ 文件:
+  - pyberny_final.xyz
+  - pyberny_initial.xyz
+开始生成 HTML 文件...
+分子结构图已保存：./output/CCO_0.01/pyberny/structures/pyberny_final.html
+分子结构图已保存：./output/CCO_0.01/pyberny/structures/pyberny_initial.html
+完成！生成了 2 个 HTML 文件:
+  ✓ pyberny_final.html
+  ✓ pyberny_initial.html
+
+============================================================
+总计生成了 6 个 HTML 文件
+提示：用浏览器打开 HTML 文件可查看交互式 3D 分子结构。
+(gpr_env) liuzhe@tianxuan:/mnt/e/wsl_dir/pyberny_gpr$ python main.py --xyz_path ./config/initial_xyz/CCCC_initial.xyz --xyz_name my_CCCC --method pyberny
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.16.5 and <1.23.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/berny/species_data.py:6: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_string
+
+======================================================================
+PyBerny-GPR 混合优化项目
+======================================================================
+模式：从 XYZ 文件读取初始构型
+XYZ 文件：./config/initial_xyz/CCCC_initial.xyz
+输出目录：./output/my_CCCC/pyberny
+方法：pyberny
+======================================================================
+
+初始结构:
+  原子数：14
+  自由度：42
+分子结构已保存：./output/my_CCCC/pyberny/structures/pyberny_initial.xyz
+
+======================================================================
+运行优化：PYBERNY
+======================================================================
+======================================================================
+PyBerny 基准优化开始（完整 BFGS，一次性运行）
+======================================================================
+原子数：14
+自由度：42
+最大步数：500
+Trust Radius: 0.3 Å
+收敛阈值：能量=1e-06, 梯度=0.0001, 位移=0.001
+======================================================================
+初始能量：-156.9719208364 Hartree
+初始梯度范数：1.140868
+Iter    0: Energy = -156.9719208364 Hartree, |grad| = 1.140868, disp=0.000000
+Iter    1: Energy = -157.0516182384 Hartree, |grad| = 0.866583, disp=0.150221
+Iter    2: Energy = -157.1078732597 Hartree, |grad| = 0.745877, disp=0.163987
+Iter    3: Energy = -157.1513531207 Hartree, |grad| = 0.650378, disp=0.129186
+Iter    4: Energy = -157.1855977422 Hartree, |grad| = 0.575113, disp=0.120662
+Iter    5: Energy = -157.2135342711 Hartree, |grad| = 0.505256, disp=0.095915
+Iter    6: Energy = -157.2368669850 Hartree, |grad| = 0.435417, disp=0.078835
+Iter    7: Energy = -157.2563146056 Hartree, |grad| = 0.361348, disp=0.073225
+Iter    8: Energy = -157.2719041773 Hartree, |grad| = 0.281653, disp=0.082733
+Iter    9: Energy = -157.2833312908 Hartree, |grad| = 0.202093, disp=0.099546
+Iter   10: Energy = -157.2907840282 Hartree, |grad| = 0.142269, disp=0.105352
+Iter   11: Energy = -157.2954617746 Hartree, |grad| = 0.105660, disp=0.080693
+Iter   12: Energy = -157.2985590752 Hartree, |grad| = 0.075998, disp=0.058211
+Iter   13: Energy = -157.3006567059 Hartree, |grad| = 0.049940, disp=0.058903
+Iter   14: Energy = -157.3020163551 Hartree, |grad| = 0.028746, disp=0.073439
+Iter   15: Energy = -157.3028347953 Hartree, |grad| = 0.015812, disp=0.098135
+Iter   16: Energy = -157.3035810204 Hartree, |grad| = 0.007862, disp=0.112213
+Iter   17: Energy = -157.3042608359 Hartree, |grad| = 0.008866, disp=0.125607
+Iter   18: Energy = -157.3049462220 Hartree, |grad| = 0.013251, disp=0.128614
+Iter   19: Energy = -157.3056058187 Hartree, |grad| = 0.016787, disp=0.127837
+Iter   20: Energy = -157.3061840505 Hartree, |grad| = 0.021240, disp=0.132912
+Iter   21: Energy = -157.3068279543 Hartree, |grad| = 0.015716, disp=0.126132
+Iter   22: Energy = -157.3073848512 Hartree, |grad| = 0.015142, disp=0.133272
+Iter   23: Energy = -157.3078755892 Hartree, |grad| = 0.009116, disp=0.128684
+Iter   24: Energy = -157.3081622022 Hartree, |grad| = 0.008554, disp=0.134881
+Iter   25: Energy = -157.3082349253 Hartree, |grad| = 0.010613, disp=0.131706
+Iter   26: Energy = -157.3083018604 Hartree, |grad| = 0.005927, disp=0.051618
+Iter   27: Energy = -157.3083346359 Hartree, |grad| = 0.004939, disp=0.033169
+Iter   28: Energy = -157.3083520632 Hartree, |grad| = 0.001935, disp=0.024657
+Iter   29: Energy = -157.3083649915 Hartree, |grad| = 0.001640, disp=0.025569
+Iter   30: Energy = -157.3083744786 Hartree, |grad| = 0.000869, disp=0.019989
+Iter   31: Energy = -157.3083804518 Hartree, |grad| = 0.000775, disp=0.021337
+Iter   32: Energy = -157.3083834050 Hartree, |grad| = 0.000878, disp=0.022584
+Iter   33: Energy = -157.3083840647 Hartree, |grad| = 0.000652, disp=0.014813
+Iter   34: Energy = -157.3083843398 Hartree, |grad| = 0.000410, disp=0.003362
+Iter   35: Energy = -157.3083844606 Hartree, |grad| = 0.000199, disp=0.002440
+Iter   36: Energy = -157.3083845133 Hartree, |grad| = 0.000070, disp=0.002858
+
+✓ 收敛！梯度范数：0.000070 < 阈值 0.0001
+======================================================================
+优化完成！
+最终能量：-157.3083845133 Hartree
+最终梯度范数：0.000070
+迭代次数：37
+收敛状态：是
+计算时间：174.88 秒
+能量/梯度调用次数：37
+======================================================================
+优化历史已保存：./output/my_CCCC/pyberny/pyberny_20260418_162006.json
+优化轨迹已保存：./output/my_CCCC/pyberny/trajectories/pyberny_trajectory_20260418_162006.xyz
+详细迭代信息已保存：./output/my_CCCC/pyberny/pyberny_details_20260418_162006.json
+分子结构已保存：./output/my_CCCC/pyberny/structures/pyberny_final.xyz
+
+======================================================================
+优化结果
+======================================================================
+方法：pyberny
+收敛：True
+初始能量：-156.9719208364 Hartree
+最终能量：-157.3083845133 Hartree
+最终梯度：0.000070 Hartree/Å
+总迭代次数：37
+======================================================================
+(gpr_env) liuzhe@tianxuan:/mnt/e/wsl_dir/pyberny_gpr$ python main.py --xyz_path ./config/initial_xyz/CCCC_initial.xyz --xyz_name my_CCCC --method pyberny --multi
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.16.5 and <1.23.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/berny/species_data.py:6: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_string
+
+======================================================================
+PyBerny-GPR 混合优化项目
+======================================================================
+模式：从 XYZ 文件读取初始构型
+XYZ 文件：./config/initial_xyz/CCCC_initial.xyz
+输出目录：./output/my_CCCC/pyberny_multi
+方法：pyberny
+======================================================================
+
+初始结构:
+  原子数：14
+  自由度：42
+分子结构已保存：./output/my_CCCC/pyberny_multi/structures/pyberny_initial.xyz
+
+======================================================================
+运行优化：PYBERNY
+======================================================================
+======================================================================
+PyBerny 基准优化开始（多起点策略）
+第一轮：15 步，后续每轮：10 步
+======================================================================
+原子数：14
+自由度：42
+收敛阈值：能量=1e-06, 梯度=0.0001, 位移=0.001
+======================================================================
+
+======================================================================
+第 1 轮优化
+======================================================================
+本轮起点：E=-156.97192084, |g|=1.140868
+[PyBerny] 执行 15 步...
+Iter    0: Energy = -156.9719208364 Hartree, |grad| = 1.140868
+Iter    1: Energy = -157.0516182384 Hartree, |grad| = 0.866583, disp=0.150221
+Iter    2: Energy = -157.1078732597 Hartree, |grad| = 0.745877, disp=0.163987
+Iter    3: Energy = -157.1513531207 Hartree, |grad| = 0.650378, disp=0.129186
+Iter    4: Energy = -157.1855977422 Hartree, |grad| = 0.575113, disp=0.120662
+Iter    5: Energy = -157.2135342711 Hartree, |grad| = 0.505256, disp=0.095915
+Iter    6: Energy = -157.2368669850 Hartree, |grad| = 0.435417, disp=0.078835
+Iter    7: Energy = -157.2563146056 Hartree, |grad| = 0.361348, disp=0.073225
+Iter    8: Energy = -157.2719041773 Hartree, |grad| = 0.281653, disp=0.082733
+Iter    9: Energy = -157.2833312908 Hartree, |grad| = 0.202093, disp=0.099546
+Iter   10: Energy = -157.2907840282 Hartree, |grad| = 0.142269, disp=0.105352
+Iter   11: Energy = -157.2954617746 Hartree, |grad| = 0.105660, disp=0.080693
+Iter   12: Energy = -157.2985590756 Hartree, |grad| = 0.075998, disp=0.058211
+Iter   13: Energy = -157.3006567057 Hartree, |grad| = 0.049940, disp=0.058903
+Iter   14: Energy = -157.3020163552 Hartree, |grad| = 0.028746, disp=0.073439
+本轮终点：E=-157.30201636, |g|=0.028746
+本轮 PySCF 调用次数：14
+
+======================================================================
+第 2 轮优化
+======================================================================
+本轮起点：E=-157.30201636, |g|=0.028746
+[PyBerny] 执行 10 步...
+Iter    0: Energy = -157.3020163552 Hartree, |grad| = 0.028746
+Iter    1: Energy = -157.3030521880 Hartree, |grad| = 0.013583, disp=0.196432
+Iter    2: Energy = -157.3038051057 Hartree, |grad| = 0.007919, disp=0.144976
+Iter    3: Energy = -157.3046126381 Hartree, |grad| = 0.009704, disp=0.169402
+Iter    4: Energy = -157.3054475049 Hartree, |grad| = 0.008096, disp=0.167939
+Iter    5: Energy = -157.3062668880 Hartree, |grad| = 0.008180, disp=0.166749
+Iter    6: Energy = -157.3069964536 Hartree, |grad| = 0.006140, disp=0.157237
+Iter    7: Energy = -157.3075906296 Hartree, |grad| = 0.006699, disp=0.178293
+Iter    8: Energy = -157.3080380749 Hartree, |grad| = 0.005971, disp=0.171529
+Iter    9: Energy = -157.3082994127 Hartree, |grad| = 0.003762, disp=0.176411
+本轮终点：E=-157.30829941, |g|=0.003762
+本轮 PySCF 调用次数：9
+
+======================================================================
+第 3 轮优化
+======================================================================
+本轮起点：E=-157.30829941, |g|=0.003762
+[PyBerny] 执行 10 步...
+Iter    0: Energy = -157.3082994127 Hartree, |grad| = 0.003762
+Iter    1: Energy = -157.3083520793 Hartree, |grad| = 0.006212, disp=0.136581
+Iter    2: Energy = -157.3083761824 Hartree, |grad| = 0.002735, disp=0.106062
+Iter    3: Energy = -157.3083792679 Hartree, |grad| = 0.002016, disp=0.034516
+Iter    4: Energy = -157.3083838077 Hartree, |grad| = 0.000605, disp=0.016234
+Iter    5: Energy = -157.3083841441 Hartree, |grad| = 0.000634, disp=0.015968
+Iter    6: Energy = -157.3083844565 Hartree, |grad| = 0.000233, disp=0.005203
+berny 提前终止（实际 8 步 < 设置 10 步）
+本轮终点：E=-157.30838446, |g|=0.000233
+本轮 PySCF 调用次数：6
+berny 提前终止（已收敛）
+
+✓ 收敛！berny 提前终止，最终梯度范数：0.000233
+======================================================================
+优化完成！
+最终能量：-157.3083844565 Hartree
+最终梯度范数：0.000233
+迭代次数：30
+收敛状态：是
+计算时间：147.80 秒
+能量/梯度调用次数：30
+======================================================================
+优化历史已保存：./output/my_CCCC/pyberny_multi/pyberny_20260418_162251.json
+优化轨迹已保存：./output/my_CCCC/pyberny_multi/trajectories/pyberny_trajectory_20260418_162251.xyz
+详细迭代信息已保存：./output/my_CCCC/pyberny_multi/pyberny_details_20260418_162251.json
+分子结构已保存：./output/my_CCCC/pyberny_multi/structures/pyberny_final.xyz
+
+======================================================================
+优化结果
+======================================================================
+方法：pyberny
+收敛：True
+初始能量：-156.9719208364 Hartree
+最终能量：-157.3083844565 Hartree
+最终梯度：0.000233 Hartree/Å
+总迭代次数：30
+======================================================================
+(gpr_env) liuzhe@tianxuan:/mnt/e/wsl_dir/pyberny_gpr$ python main.py --xyz_path ./config/initial_xyz/CCCC_initial.xyz --xyz_name my_CCCC --method hybrid
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.16.5 and <1.23.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/berny/species_data.py:6: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_string
+
+======================================================================
+PyBerny-GPR 混合优化项目
+======================================================================
+模式：从 XYZ 文件读取初始构型
+XYZ 文件：./config/initial_xyz/CCCC_initial.xyz
+输出目录：./output/my_CCCC/hybrid_gpr
+方法：hybrid
+AI 方法：gpr
+======================================================================
+
+初始结构:
+  原子数：14
+  自由度：42
+分子结构已保存：./output/my_CCCC/hybrid_gpr/structures/hybrid_gpr_initial.xyz
+
+======================================================================
+运行优化：HYBRID
+======================================================================
+使用 AI 方法：GPR (梯度预测)
+======================================================================
+PyBerny-GPR 混合优化开始
+======================================================================
+外层步数：10（第 1 轮：15 步）
+内层步数：5
+验证频率：0（0=仅验证最后一点）
+预测误差阈值：0.001
+初始能量：-156.9719208364 Hartree
+======================================================================
+
+======================================================================
+第 1 轮优化
+======================================================================
+本轮起点：E=-156.97192084, |g|=1.140868
+
+[外层 PyBerny] 执行 15 步...
+Iter    0: Energy = -156.9719208364 Hartree, |grad| = 1.140868, disp=0.000000
+Iter    1: Energy = -157.0516182384 Hartree, |grad| = 0.866583, disp=0.150221
+Iter    2: Energy = -157.1078732597 Hartree, |grad| = 0.745877, disp=0.163987
+Iter    3: Energy = -157.1513531207 Hartree, |grad| = 0.650378, disp=0.129186
+Iter    4: Energy = -157.1855977422 Hartree, |grad| = 0.575113, disp=0.120662
+Iter    5: Energy = -157.2135342711 Hartree, |grad| = 0.505256, disp=0.095915
+Iter    6: Energy = -157.2368669850 Hartree, |grad| = 0.435417, disp=0.078835
+Iter    7: Energy = -157.2563146056 Hartree, |grad| = 0.361348, disp=0.073225
+Iter    8: Energy = -157.2719041773 Hartree, |grad| = 0.281653, disp=0.082733
+Iter    9: Energy = -157.2833312908 Hartree, |grad| = 0.202093, disp=0.099546
+Iter   10: Energy = -157.2907840282 Hartree, |grad| = 0.142269, disp=0.105352
+Iter   11: Energy = -157.2954617746 Hartree, |grad| = 0.105660, disp=0.080693
+Iter   12: Energy = -157.2985590754 Hartree, |grad| = 0.075998, disp=0.058211
+Iter   13: Energy = -157.3006567059 Hartree, |grad| = 0.049940, disp=0.058903
+Iter   14: Energy = -157.3020163553 Hartree, |grad| = 0.028746, disp=0.073439
+外层完成 15 步
+外层终点：E=-157.30201636, |g|=0.028746
+外层 PyBerny 完成 15 步
+训练数据：按梯度范数筛选保留 10 点
+GPR 模型训练完成，使用 10 个训练点
+
+[内层探索] 执行 5 步（AI 预测梯度，梯度下降法）...
+内层起点：E=-157.30201636, |g|=0.028746
+  Step 1: |g_pred|=0.028701, step=0.100000, d=0.002870
+  Step 2: |g_pred|=0.027858, step=0.100000, d=0.002786
+  Step 3: |g_pred|=0.027078, step=0.100000, d=0.002708
+  Step 4: |g_pred|=0.026353, step=0.100000, d=0.002635
+  Step 5: |g_pred|=0.025680, step=0.100000, d=0.002568
+内层终点：E_true=-157.30223653, |g_true|=0.019618
+内层实际执行：5 步 / 设置 5 步
+验证状态：完成
+
+择优结果：
+    outer_final: E=-157.30201636, |g|=0.028746, score=-0.682993
+  ✓ inner_final: E=-157.30223653, |g|=0.019618, score=-0.688594
+
+本轮最佳：inner_final
+下一轮起点：E=-157.30223653, |g|=0.019618
+
+======================================================================
+第 2 轮优化
+======================================================================
+本轮起点：E=-157.30223653, |g|=0.019618
+
+[外层 PyBerny] 执行 10 步...
+Iter    0: Energy = -157.3022365327 Hartree, |grad| = 0.019618, disp=0.000000
+Iter    1: Energy = -157.3031777157 Hartree, |grad| = 0.014004, disp=0.227621
+Iter    2: Energy = -157.3039733223 Hartree, |grad| = 0.009126, disp=0.163603
+Iter    3: Energy = -157.3047588007 Hartree, |grad| = 0.011177, disp=0.182634
+Iter    4: Energy = -157.3056157496 Hartree, |grad| = 0.008876, disp=0.164847
+Iter    5: Energy = -157.3064285498 Hartree, |grad| = 0.007296, disp=0.158906
+Iter    6: Energy = -157.3071427459 Hartree, |grad| = 0.006214, disp=0.162400
+Iter    7: Energy = -157.3077257606 Hartree, |grad| = 0.005261, disp=0.165709
+Iter    8: Energy = -157.3081065802 Hartree, |grad| = 0.007838, disp=0.175745
+Iter    9: Energy = -157.3083040292 Hartree, |grad| = 0.008085, disp=0.178012
+外层完成 10 步
+外层终点：E=-157.30830403, |g|=0.008085
+外层 PyBerny 完成 10 步
+训练数据：按梯度范数筛选保留 10 点
+GPR 模型训练完成，使用 10 个训练点
+
+[内层探索] 执行 5 步（AI 预测梯度，梯度下降法）...
+内层起点：E=-157.30830403, |g|=0.008085
+  Step 1: |g_pred|=0.007345, step=0.041723, d=0.000306
+  Step 2: |g_pred|=0.007345, step=0.041723, d=0.000306
+  Step 3: |g_pred|=0.007344, step=0.041722, d=0.000306
+  Step 4: |g_pred|=0.007344, step=0.041720, d=0.000306
+  Step 5: |g_pred|=0.007344, step=0.041718, d=0.000306
+内层终点：E_true=-157.30831371, |g_true|=0.004989
+内层实际执行：5 步 / 设置 5 步
+验证状态：完成
+
+择优结果：
+    outer_final: E=-157.30830403, |g|=0.008085, score=-0.411522
+  ✓ inner_final: E=-157.30831371, |g|=0.004989, score=-0.521988
+
+本轮最佳：inner_final
+下一轮起点：E=-157.30831371, |g|=0.004989
+
+======================================================================
+第 3 轮优化
+======================================================================
+本轮起点：E=-157.30831371, |g|=0.004989
+
+[外层 PyBerny] 执行 10 步...
+Iter    0: Energy = -157.3083137114 Hartree, |grad| = 0.004989, disp=0.000000
+Iter    1: Energy = -157.3082589717 Hartree, |grad| = 0.012509, disp=0.131119
+Iter    2: Energy = -157.3083714007 Hartree, |grad| = 0.001421, disp=0.055053
+Iter    3: Energy = -157.3083794495 Hartree, |grad| = 0.002176, disp=0.058036
+Iter    4: Energy = -157.3083830798 Hartree, |grad| = 0.001120, disp=0.036290
+Iter    5: Energy = -157.3083834652 Hartree, |grad| = 0.001176, disp=0.012153
+Iter    6: Energy = -157.3083844193 Hartree, |grad| = 0.000347, disp=0.006015
+外层完成 7 步
+外层终点：E=-157.30838442, |g|=0.000347
+⚠ 外层 PyBerny 提前终止（实际 7 步 < 设置 10 步）
+  原因：PyBerny L-BFGS 已满足收敛条件
+
+外层 L-BFGS 已收敛，跳过内层探索
+最终结果：E=-157.30838442, |g|=0.000347
+
+======================================================================
+优化完成！
+======================================================================
+最优能量（全局梯度最小）：-157.3083844193 Hartree
+最优梯度范数：0.000347
+最优迭代：6
+总迭代次数：42
+总轮数：3
+收敛状态：收敛
+计算时间：152.51 秒
+AI 模型训练点数：10
+PySCF 调用次数：32 (外层：30, 内层验证：2)
+内层探索步数：15（使用 AI 预测，节省 PySCF 计算）
+======================================================================
+优化历史已保存：./output/my_CCCC/hybrid_gpr/hybrid_gpr_20260418_162607.json
+优化轨迹已保存：./output/my_CCCC/hybrid_gpr/trajectories/hybrid_gpr_trajectory_20260418_162607.xyz
+详细迭代信息已保存：./output/my_CCCC/hybrid_gpr/hybrid_gpr_details_20260418_162607.json
+分子结构已保存：./output/my_CCCC/hybrid_gpr/structures/hybrid_gpr_final.xyz
+
+======================================================================
+优化结果
+======================================================================
+方法：hybrid
+收敛：True
+初始能量：-156.9719208364 Hartree
+最终能量：-157.3083844193 Hartree
+最终梯度：0.000347 Hartree/Å
+总迭代次数：42
+======================================================================
+(gpr_env) liuzhe@tianxuan:/mnt/e/wsl_dir/pyberny_gpr$ python main.py --xyz_path ./config/initial_xyz/CCCC_initial.xyz --xyz_name my_CCCC --method hybrid --ai_method nn
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.16.5 and <1.23.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/berny/species_data.py:6: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_string
+
+======================================================================
+PyBerny-GPR 混合优化项目
+======================================================================
+模式：从 XYZ 文件读取初始构型
+XYZ 文件：./config/initial_xyz/CCCC_initial.xyz
+输出目录：./output/my_CCCC/hybrid_nn
+方法：hybrid
+AI 方法：nn
+======================================================================
+
+初始结构:
+  原子数：14
+  自由度：42
+分子结构已保存：./output/my_CCCC/hybrid_nn/structures/hybrid_nn_initial.xyz
+
+======================================================================
+运行优化：HYBRID
+======================================================================
+使用 AI 方法：Neural Network (能量 - 梯度联合预测)
+======================================================================
+PyBerny-Neural Network 混合优化开始
+======================================================================
+外层步数：10（第 1 轮：15 步）
+内层步数：5
+验证频率：0（0=仅验证最后一点）
+预测误差阈值：0.001
+初始能量：-156.9719208364 Hartree
+======================================================================
+
+======================================================================
+第 1 轮优化
+======================================================================
+本轮起点：E=-156.97192084, |g|=1.140868
+
+[外层 PyBerny] 执行 15 步...
+Iter    0: Energy = -156.9719208364 Hartree, |grad| = 1.140868, disp=0.000000
+Iter    1: Energy = -157.0516182384 Hartree, |grad| = 0.866583, disp=0.150221
+Iter    2: Energy = -157.1078732597 Hartree, |grad| = 0.745877, disp=0.163987
+Iter    3: Energy = -157.1513531207 Hartree, |grad| = 0.650378, disp=0.129186
+Iter    4: Energy = -157.1855977422 Hartree, |grad| = 0.575113, disp=0.120662
+Iter    5: Energy = -157.2135342711 Hartree, |grad| = 0.505256, disp=0.095915
+Iter    6: Energy = -157.2368669850 Hartree, |grad| = 0.435417, disp=0.078835
+Iter    7: Energy = -157.2563146056 Hartree, |grad| = 0.361348, disp=0.073225
+Iter    8: Energy = -157.2719041773 Hartree, |grad| = 0.281653, disp=0.082733
+Iter    9: Energy = -157.2833312908 Hartree, |grad| = 0.202093, disp=0.099546
+Iter   10: Energy = -157.2907840282 Hartree, |grad| = 0.142269, disp=0.105352
+Iter   11: Energy = -157.2954617746 Hartree, |grad| = 0.105660, disp=0.080693
+Iter   12: Energy = -157.2985590754 Hartree, |grad| = 0.075998, disp=0.058211
+Iter   13: Energy = -157.3006567059 Hartree, |grad| = 0.049940, disp=0.058903
+Iter   14: Energy = -157.3020163553 Hartree, |grad| = 0.028746, disp=0.073439
+外层完成 15 步
+外层终点：E=-157.30201636, |g|=0.028746
+外层 PyBerny 完成 15 步
+训练数据：按梯度范数筛选保留 10 点
+NN 模型训练完成，使用 10 个训练点，最佳验证损失：0.046398
+
+[内层探索] 执行 5 步（AI 预测梯度，梯度下降法）...
+内层起点：E=-157.30201636, |g|=0.028746
+  Step 1: |g_pred|=0.127416, step=0.100000, d=0.012742
+  Step 2: |g_pred|=0.125496, step=0.100000, d=0.012550
+  Step 3: |g_pred|=0.123312, step=0.100000, d=0.012331
+  Step 4: |g_pred|=0.120542, step=0.100000, d=0.012054
+  Step 5: |g_pred|=0.117248, step=0.100000, d=0.011725
+内层终点：E_true=-157.29798804, |g_true|=0.175574
+内层实际执行：5 步 / 设置 5 步
+验证状态：完成
+
+择优结果：
+  ✓ outer_final: E=-157.30201636, |g|=0.028746, score=-0.682993
+    inner_final: E=-157.29798804, |g|=0.175574, score=-0.592896
+
+本轮最佳：outer_final
+下一轮起点：E=-157.30201636, |g|=0.028746
+
+======================================================================
+第 2 轮优化
+======================================================================
+本轮起点：E=-157.30201636, |g|=0.028746
+
+[外层 PyBerny] 执行 10 步...
+Iter    0: Energy = -157.3020163553 Hartree, |grad| = 0.028746, disp=0.000000
+Iter    1: Energy = -157.3030521880 Hartree, |grad| = 0.013583, disp=0.196432
+Iter    2: Energy = -157.3038051057 Hartree, |grad| = 0.007919, disp=0.144976
+Iter    3: Energy = -157.3046126382 Hartree, |grad| = 0.009704, disp=0.169401
+Iter    4: Energy = -157.3054475050 Hartree, |grad| = 0.008096, disp=0.167939
+Iter    5: Energy = -157.3062668881 Hartree, |grad| = 0.008180, disp=0.166749
+Iter    6: Energy = -157.3069964537 Hartree, |grad| = 0.006140, disp=0.157237
+Iter    7: Energy = -157.3075906296 Hartree, |grad| = 0.006699, disp=0.178293
+Iter    8: Energy = -157.3080380748 Hartree, |grad| = 0.005971, disp=0.171529
+Iter    9: Energy = -157.3082994127 Hartree, |grad| = 0.003762, disp=0.176411
+外层完成 10 步
+外层终点：E=-157.30829941, |g|=0.003762
+外层 PyBerny 完成 10 步
+训练数据：按梯度范数筛选保留 10 点
+NN 模型训练完成，使用 10 个训练点，最佳验证损失：0.383869
+
+[内层探索] 执行 5 步（AI 预测梯度，梯度下降法）...
+内层起点：E=-157.30829941, |g|=0.003762
+  Step 1: |g_pred|=0.006116, step=0.035579, d=0.000218
+  Step 2: |g_pred|=0.006117, step=0.035584, d=0.000218
+  Step 3: |g_pred|=0.006118, step=0.035589, d=0.000218
+  Step 4: |g_pred|=0.006119, step=0.035594, d=0.000218
+  Step 5: |g_pred|=0.006120, step=0.035599, d=0.000218
+内层终点：E_true=-157.30829910, |g_true|=0.004375
+内层实际执行：5 步 / 设置 5 步
+验证状态：完成
+
+择优结果：
+  ✓ outer_final: E=-157.30829941, |g|=0.003762, score=-0.608410
+    inner_final: E=-157.30829910, |g|=0.004375, score=-0.593478
+
+本轮最佳：outer_final
+下一轮起点：E=-157.30829941, |g|=0.003762
+
+======================================================================
+第 3 轮优化
+======================================================================
+本轮起点：E=-157.30829941, |g|=0.003762
+
+[外层 PyBerny] 执行 10 步...
+Iter    0: Energy = -157.3082994127 Hartree, |grad| = 0.003762, disp=0.000000
+Iter    1: Energy = -157.3083520789 Hartree, |grad| = 0.006212, disp=0.136581
+Iter    2: Energy = -157.3083761823 Hartree, |grad| = 0.002735, disp=0.106062
+Iter    3: Energy = -157.3083792677 Hartree, |grad| = 0.002016, disp=0.034516
+Iter    4: Energy = -157.3083838077 Hartree, |grad| = 0.000605, disp=0.016234
+Iter    5: Energy = -157.3083841440 Hartree, |grad| = 0.000634, disp=0.015968
+Iter    6: Energy = -157.3083844565 Hartree, |grad| = 0.000233, disp=0.005203
+外层完成 7 步
+外层终点：E=-157.30838446, |g|=0.000233
+⚠ 外层 PyBerny 提前终止（实际 7 步 < 设置 10 步）
+  原因：PyBerny L-BFGS 已满足收敛条件
+
+外层 L-BFGS 已收敛，跳过内层探索
+最终结果：E=-157.30838446, |g|=0.000233
+
+======================================================================
+优化完成！
+======================================================================
+最优能量（全局梯度最小）：-157.3083844565 Hartree
+最优梯度范数：0.000233
+最优迭代：6
+总迭代次数：42
+总轮数：3
+收敛状态：收敛
+计算时间：152.12 秒
+AI 模型训练点数：10
+PySCF 调用次数：32 (外层：30, 内层验证：2)
+内层探索步数：15（使用 AI 预测，节省 PySCF 计算）
+======================================================================
+优化历史已保存：./output/my_CCCC/hybrid_nn/hybrid_nn_20260418_163204.json
+优化轨迹已保存：./output/my_CCCC/hybrid_nn/trajectories/hybrid_nn_trajectory_20260418_163204.xyz
+详细迭代信息已保存：./output/my_CCCC/hybrid_nn/hybrid_nn_details_20260418_163204.json
+分子结构已保存：./output/my_CCCC/hybrid_nn/structures/hybrid_nn_final.xyz
+
+======================================================================
+优化结果
+======================================================================
+方法：hybrid
+收敛：True
+初始能量：-156.9719208364 Hartree
+最终能量：-157.3083844565 Hartree
+最终梯度：0.000233 Hartree/Å
+总迭代次数：42
+======================================================================
+(gpr_env) liuzhe@tianxuan:/mnt/e/wsl_dir/pyberny_gpr$ python main.py --method pyberny --smiles C1CC1 --perturb 0.2 --multi
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.16.5 and <1.23.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/berny/species_data.py:6: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_string
+
+======================================================================
+PyBerny-GPR 混合优化项目
+======================================================================
+分子：C1CC1
+扰动：0.2 Å
+种子：42
+方法：pyberny
+输出目录：./output/C1CC1_0.2/pyberny_multi
+======================================================================
+
+初始结构:
+  原子数：9
+  自由度：27
+分子结构已保存：./output/C1CC1_0.2/pyberny_multi/structures/pyberny_initial.xyz
+
+======================================================================
+运行优化：PYBERNY
+======================================================================
+======================================================================
+PyBerny 基准优化开始（多起点策略）
+第一轮：15 步，后续每轮：10 步
+======================================================================
+原子数：9
+自由度：27
+收敛阈值：能量=1e-06, 梯度=0.0001, 位移=0.001
+======================================================================
+
+======================================================================
+第 1 轮优化
+======================================================================
+本轮起点：E=-116.73197426, |g|=1.847457
+[PyBerny] 执行 15 步...
+Iter    0: Energy = -116.7319742627 Hartree, |grad| = 1.847457
+Iter    1: Energy = -116.8569285444 Hartree, |grad| = 1.134576, disp=0.155403
+Iter    2: Energy = -116.9327409495 Hartree, |grad| = 0.821605, disp=0.122756
+Iter    3: Energy = -116.9850837462 Hartree, |grad| = 0.597519, disp=0.115400
+Iter    4: Energy = -117.0190512846 Hartree, |grad| = 0.406154, disp=0.100633
+Iter    5: Energy = -117.0380641062 Hartree, |grad| = 0.251409, disp=0.076056
+Iter    6: Energy = -117.0496709431 Hartree, |grad| = 0.171029, disp=0.082111
+Iter    7: Energy = -117.0578501021 Hartree, |grad| = 0.112352, disp=0.085272
+Iter    8: Energy = -117.0631983624 Hartree, |grad| = 0.065270, disp=0.087740
+Iter    9: Energy = -117.0661434595 Hartree, |grad| = 0.030613, disp=0.096440
+Iter   10: Energy = -117.0672002744 Hartree, |grad| = 0.013187, disp=0.108273
+Iter   11: Energy = -117.0672506491 Hartree, |grad| = 0.010536, disp=0.044664
+Iter   12: Energy = -117.0672926634 Hartree, |grad| = 0.002978, disp=0.018522
+Iter   13: Energy = -117.0672954169 Hartree, |grad| = 0.002976, disp=0.007805
+Iter   14: Energy = -117.0672968572 Hartree, |grad| = 0.000977, disp=0.003011
+本轮终点：E=-117.06729686, |g|=0.000977
+本轮 PySCF 调用次数：14
+
+======================================================================
+第 2 轮优化
+======================================================================
+本轮起点：E=-117.06729686, |g|=0.000977
+[PyBerny] 执行 10 步...
+Iter    0: Energy = -117.0672968572 Hartree, |grad| = 0.000977
+Iter    1: Energy = -117.0672970813 Hartree, |grad| = 0.000359, disp=0.001771
+berny 提前终止（实际 3 步 < 设置 10 步）
+本轮终点：E=-117.06729708, |g|=0.000359
+本轮 PySCF 调用次数：1
+berny 提前终止（已收敛）
+
+✓ 收敛！berny 提前终止，最终梯度范数：0.000359
+======================================================================
+优化完成！
+最终能量：-117.0672970813 Hartree
+最终梯度范数：0.000359
+迭代次数：16
+收敛状态：是
+计算时间：32.72 秒
+能量/梯度调用次数：16
+======================================================================
+优化历史已保存：./output/C1CC1_0.2/pyberny_multi/pyberny_20260418_164644.json
+优化轨迹已保存：./output/C1CC1_0.2/pyberny_multi/trajectories/pyberny_trajectory_20260418_164644.xyz
+详细迭代信息已保存：./output/C1CC1_0.2/pyberny_multi/pyberny_details_20260418_164644.json
+分子结构已保存：./output/C1CC1_0.2/pyberny_multi/structures/pyberny_final.xyz
+
+======================================================================
+优化结果
+======================================================================
+方法：pyberny
+收敛：True
+初始能量：-116.7319742627 Hartree
+最终能量：-117.0672970813 Hartree
+最终梯度：0.000359 Hartree/Å
+总迭代次数：16
+======================================================================
+(gpr_env) liuzhe@tianxuan:/mnt/e/wsl_dir/pyberny_gpr$ python main.py --method hybrid --smiles C1CC1 --perturb 0.2 --ai_method nn
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.16.5 and <1.23.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/berny/species_data.py:6: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_string
+
+======================================================================
+PyBerny-GPR 混合优化项目
+======================================================================
+分子：C1CC1
+扰动：0.2 Å
+种子：42
+方法：hybrid
+AI 方法：nn
+输出目录：./output/C1CC1_0.2/hybrid_nn
+======================================================================
+
+初始结构:
+  原子数：9
+  自由度：27
+分子结构已保存：./output/C1CC1_0.2/hybrid_nn/structures/hybrid_nn_initial.xyz
+
+======================================================================
+运行优化：HYBRID
+======================================================================
+使用 AI 方法：Neural Network (能量 - 梯度联合预测)
+======================================================================
+PyBerny-Neural Network 混合优化开始
+======================================================================
+外层步数：10（第 1 轮：15 步）
+内层步数：5
+验证频率：0（0=仅验证最后一点）
+预测误差阈值：0.001
+初始能量：-116.7319742627 Hartree
+======================================================================
+
+======================================================================
+第 1 轮优化
+======================================================================
+本轮起点：E=-116.73197426, |g|=1.847457
+
+[外层 PyBerny] 执行 15 步...
+Iter    0: Energy = -116.7319742627 Hartree, |grad| = 1.847457, disp=0.000000
+Iter    1: Energy = -116.8569285444 Hartree, |grad| = 1.134576, disp=0.155403
+Iter    2: Energy = -116.9327409495 Hartree, |grad| = 0.821605, disp=0.122756
+Iter    3: Energy = -116.9850837462 Hartree, |grad| = 0.597519, disp=0.115400
+Iter    4: Energy = -117.0190512846 Hartree, |grad| = 0.406154, disp=0.100633
+Iter    5: Energy = -117.0380641062 Hartree, |grad| = 0.251409, disp=0.076056
+Iter    6: Energy = -117.0496709431 Hartree, |grad| = 0.171029, disp=0.082111
+Iter    7: Energy = -117.0578501021 Hartree, |grad| = 0.112352, disp=0.085272
+Iter    8: Energy = -117.0631983624 Hartree, |grad| = 0.065270, disp=0.087740
+Iter    9: Energy = -117.0661434595 Hartree, |grad| = 0.030613, disp=0.096440
+Iter   10: Energy = -117.0672002744 Hartree, |grad| = 0.013187, disp=0.108273
+Iter   11: Energy = -117.0672506491 Hartree, |grad| = 0.010536, disp=0.044664
+Iter   12: Energy = -117.0672926634 Hartree, |grad| = 0.002978, disp=0.018522
+Iter   13: Energy = -117.0672954169 Hartree, |grad| = 0.002976, disp=0.007805
+Iter   14: Energy = -117.0672968572 Hartree, |grad| = 0.000977, disp=0.003011
+外层完成 15 步
+外层终点：E=-117.06729686, |g|=0.000977
+外层 PyBerny 完成 15 步
+训练数据：按梯度范数筛选保留 10 点
+NN 模型训练完成，使用 10 个训练点，最佳验证损失：0.034609
+
+[内层探索] 执行 5 步（AI 预测梯度，梯度下降法）...
+内层起点：E=-117.06729686, |g|=0.000977
+  Step 1: |g_pred|=0.037758, step=0.100000, d=0.003776
+  Step 2: |g_pred|=0.037409, step=0.100000, d=0.003741
+  Step 3: |g_pred|=0.037318, step=0.100000, d=0.003732
+  Step 4: |g_pred|=0.037297, step=0.100000, d=0.003730
+  Step 5: |g_pred|=0.037375, step=0.100000, d=0.003738
+内层终点：E_true=-117.06688410, |g_true|=0.053952
+内层实际执行：5 步 / 设置 5 步
+验证状态：完成
+
+择优结果：
+  ✓ outer_final: E=-117.06729686, |g|=0.000977, score=-0.700491
+    inner_final: E=-117.06688410, |g|=0.053952, score=-0.680418
+
+本轮最佳：outer_final
+下一轮起点：E=-117.06729686, |g|=0.000977
+
+======================================================================
+第 2 轮优化
+======================================================================
+本轮起点：E=-117.06729686, |g|=0.000977
+
+[外层 PyBerny] 执行 10 步...
+Iter    0: Energy = -117.0672968572 Hartree, |grad| = 0.000977, disp=0.000000
+Iter    1: Energy = -117.0672970813 Hartree, |grad| = 0.000359, disp=0.001771
+外层完成 2 步
+外层终点：E=-117.06729708, |g|=0.000359
+⚠ 外层 PyBerny 提前终止（实际 2 步 < 设置 10 步）
+  原因：PyBerny L-BFGS 已满足收敛条件
+
+外层 L-BFGS 已收敛，跳过内层探索
+最终结果：E=-117.06729708, |g|=0.000359
+
+======================================================================
+优化完成！
+======================================================================
+最优能量（全局梯度最小）：-117.0672970813 Hartree
+最优梯度范数：0.000359
+最优迭代：1
+总迭代次数：22
+总轮数：2
+收敛状态：收敛
+计算时间：33.65 秒
+AI 模型训练点数：10
+PySCF 调用次数：17 (外层：16, 内层验证：1)
+内层探索步数：10（使用 AI 预测，节省 PySCF 计算）
+======================================================================
+优化历史已保存：./output/C1CC1_0.2/hybrid_nn/hybrid_nn_20260418_164836.json
+优化轨迹已保存：./output/C1CC1_0.2/hybrid_nn/trajectories/hybrid_nn_trajectory_20260418_164836.xyz
+详细迭代信息已保存：./output/C1CC1_0.2/hybrid_nn/hybrid_nn_details_20260418_164836.json
+分子结构已保存：./output/C1CC1_0.2/hybrid_nn/structures/hybrid_nn_final.xyz
+
+======================================================================
+优化结果
+======================================================================
+方法：hybrid
+收敛：True
+初始能量：-116.7319742627 Hartree
+最终能量：-117.0672970813 Hartree
+最终梯度：0.000359 Hartree/Å
+总迭代次数：22
+======================================================================
+(gpr_env) liuzhe@tianxuan:/mnt/e/wsl_dir/pyberny_gpr$ python main.py --method hybrid --smiles C1CC1 --perturb 0.2 --ai_method gpr
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.16.5 and <1.23.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/berny/species_data.py:6: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import resource_string
+
+======================================================================
+PyBerny-GPR 混合优化项目
+======================================================================
+分子：C1CC1
+扰动：0.2 Å
+种子：42
+方法：hybrid
+AI 方法：gpr
+输出目录：./output/C1CC1_0.2/hybrid_gpr
+======================================================================
+
+初始结构:
+  原子数：9
+  自由度：27
+分子结构已保存：./output/C1CC1_0.2/hybrid_gpr/structures/hybrid_gpr_initial.xyz
+
+======================================================================
+运行优化：HYBRID
+======================================================================
+使用 AI 方法：GPR (梯度预测)
+======================================================================
+PyBerny-GPR 混合优化开始
+======================================================================
+外层步数：10（第 1 轮：15 步）
+内层步数：5
+验证频率：0（0=仅验证最后一点）
+预测误差阈值：0.001
+初始能量：-116.7319742627 Hartree
+======================================================================
+
+======================================================================
+第 1 轮优化
+======================================================================
+本轮起点：E=-116.73197426, |g|=1.847457
+
+[外层 PyBerny] 执行 15 步...
+Iter    0: Energy = -116.7319742627 Hartree, |grad| = 1.847457, disp=0.000000
+Iter    1: Energy = -116.8569285444 Hartree, |grad| = 1.134576, disp=0.155403
+Iter    2: Energy = -116.9327409495 Hartree, |grad| = 0.821605, disp=0.122756
+Iter    3: Energy = -116.9850837462 Hartree, |grad| = 0.597519, disp=0.115400
+Iter    4: Energy = -117.0190512846 Hartree, |grad| = 0.406154, disp=0.100633
+Iter    5: Energy = -117.0380641062 Hartree, |grad| = 0.251409, disp=0.076056
+Iter    6: Energy = -117.0496709431 Hartree, |grad| = 0.171029, disp=0.082111
+Iter    7: Energy = -117.0578501021 Hartree, |grad| = 0.112352, disp=0.085272
+Iter    8: Energy = -117.0631983624 Hartree, |grad| = 0.065270, disp=0.087740
+Iter    9: Energy = -117.0661434595 Hartree, |grad| = 0.030613, disp=0.096440
+Iter   10: Energy = -117.0672002744 Hartree, |grad| = 0.013187, disp=0.108273
+Iter   11: Energy = -117.0672506491 Hartree, |grad| = 0.010536, disp=0.044664
+Iter   12: Energy = -117.0672926634 Hartree, |grad| = 0.002978, disp=0.018522
+Iter   13: Energy = -117.0672954169 Hartree, |grad| = 0.002976, disp=0.007805
+Iter   14: Energy = -117.0672968572 Hartree, |grad| = 0.000977, disp=0.003011
+外层完成 15 步
+外层终点：E=-117.06729686, |g|=0.000977
+外层 PyBerny 完成 15 步
+训练数据：按梯度范数筛选保留 10 点
+GPR 模型训练完成，使用 10 个训练点
+
+[内层探索] 执行 5 步（AI 预测梯度，梯度下降法）...
+内层起点：E=-117.06729686, |g|=0.000977
+  Step 1: |g_pred|=0.001874, step=0.014370, d=0.000027
+  Step 2: |g_pred|=0.001868, step=0.014338, d=0.000027
+  Step 3: |g_pred|=0.001861, step=0.014306, d=0.000027
+  Step 4: |g_pred|=0.001855, step=0.014275, d=0.000026
+  Step 5: |g_pred|=0.001849, step=0.014243, d=0.000026
+内层终点：E_true=-117.06729692, |g_true|=0.000716
+内层实际执行：5 步 / 设置 5 步
+验证状态：完成
+
+择优结果：
+    outer_final: E=-117.06729686, |g|=0.000977, score=-0.700491
+  ✓ inner_final: E=-117.06729692, |g|=0.000716, score=-0.700590
+
+本轮最佳：inner_final
+下一轮起点：E=-117.06729692, |g|=0.000716
+
+======================================================================
+第 2 轮优化
+======================================================================
+本轮起点：E=-117.06729692, |g|=0.000716
+
+[外层 PyBerny] 执行 10 步...
+Iter    0: Energy = -117.0672969204 Hartree, |grad| = 0.000716, disp=0.000000
+外层完成 1 步
+外层终点：E=-117.06729692, |g|=0.000716
+⚠ 外层 PyBerny 提前终止（实际 1 步 < 设置 10 步）
+  原因：PyBerny L-BFGS 已满足收敛条件
+
+外层 L-BFGS 已收敛，跳过内层探索
+最终结果：E=-117.06729692, |g|=0.000716
+
+======================================================================
+优化完成！
+======================================================================
+最优能量（全局梯度最小）：-117.0672969204 Hartree
+最优梯度范数：0.000716
+最优迭代：0
+总迭代次数：21
+总轮数：2
+收敛状态：收敛
+计算时间：32.54 秒
+AI 模型训练点数：10
+PySCF 调用次数：16 (外层：15, 内层验证：1)
+内层探索步数：10（使用 AI 预测，节省 PySCF 计算）
+======================================================================
+优化历史已保存：./output/C1CC1_0.2/hybrid_gpr/hybrid_gpr_20260418_164956.json
+优化轨迹已保存：./output/C1CC1_0.2/hybrid_gpr/trajectories/hybrid_gpr_trajectory_20260418_164956.xyz
+详细迭代信息已保存：./output/C1CC1_0.2/hybrid_gpr/hybrid_gpr_details_20260418_164956.json
+分子结构已保存：./output/C1CC1_0.2/hybrid_gpr/structures/hybrid_gpr_final.xyz
+
+======================================================================
+优化结果
+======================================================================
+方法：hybrid
+收敛：True
+初始能量：-116.7319742627 Hartree
+最终能量：-117.0672969204 Hartree
+最终梯度：0.000716 Hartree/Å
+总迭代次数：21
+======================================================================
+(gpr_env) liuzhe@tianxuan:/mnt/e/wsl_dir/pyberny_gpr$ python draw_structure3D.py 
+在 './output' 下找到 12 个 structures 目录:
+  - ./output/C1CC1_0.2/hybrid_gpr/structures
+  - ./output/C1CC1_0.2/hybrid_nn/structures
+  - ./output/C1CC1_0.2/pyberny/structures
+  - ./output/C1CC1_0.2/pyberny_multi/structures
+  - ./output/CCO_0.01/hybrid_gpr/structures
+  - ./output/CCO_0.01/hybrid_nn/structures
+  - ./output/CCO_0.01/pyberny/structures
+  - ./output/CCO_0.01/pyberny_multi/structures
+  - ./output/my_CCCC/hybrid_gpr/structures
+  - ./output/my_CCCC/hybrid_nn/structures
+  - ./output/my_CCCC/pyberny/structures
+  - ./output/my_CCCC/pyberny_multi/structures
+/home/liuzhe/miniconda3/envs/gpr_env/lib/python3.9/site-packages/scipy/__init__.py:146: UserWarning: A NumPy version >=1.16.5 and <1.23.0 is required for this version of SciPy (detected version 1.26.4
+  warnings.warn(f"A NumPy version >={np_minversion} and <{np_maxversion}"
+
+处理目录：./output/C1CC1_0.2/hybrid_gpr/structures
+找到 2 个 XYZ 文件
+分子结构图已保存：./output/C1CC1_0.2/hybrid_gpr/structures/hybrid_gpr_final.html
+分子结构图已保存：./output/C1CC1_0.2/hybrid_gpr/structures/hybrid_gpr_initial.html
+生成了 2 个 HTML 文件
+
+处理目录：./output/C1CC1_0.2/hybrid_nn/structures
+找到 2 个 XYZ 文件
+分子结构图已保存：./output/C1CC1_0.2/hybrid_nn/structures/hybrid_nn_final.html
+分子结构图已保存：./output/C1CC1_0.2/hybrid_nn/structures/hybrid_nn_initial.html
+生成了 2 个 HTML 文件
+
+处理目录：./output/C1CC1_0.2/pyberny/structures
+找到 2 个 XYZ 文件
+分子结构图已保存：./output/C1CC1_0.2/pyberny/structures/pyberny_final.html
+分子结构图已保存：./output/C1CC1_0.2/pyberny/structures/pyberny_initial.html
+生成了 2 个 HTML 文件
+
+处理目录：./output/C1CC1_0.2/pyberny_multi/structures
+找到 2 个 XYZ 文件
+分子结构图已保存：./output/C1CC1_0.2/pyberny_multi/structures/pyberny_final.html
+分子结构图已保存：./output/C1CC1_0.2/pyberny_multi/structures/pyberny_initial.html
+生成了 2 个 HTML 文件
+
+处理目录：./output/CCO_0.01/hybrid_gpr/structures
+找到 2 个 XYZ 文件
+分子结构图已保存：./output/CCO_0.01/hybrid_gpr/structures/hybrid_gpr_final.html
+分子结构图已保存：./output/CCO_0.01/hybrid_gpr/structures/hybrid_gpr_initial.html
+生成了 2 个 HTML 文件
+
+处理目录：./output/CCO_0.01/hybrid_nn/structures
+找到 2 个 XYZ 文件
+分子结构图已保存：./output/CCO_0.01/hybrid_nn/structures/hybrid_nn_final.html
+分子结构图已保存：./output/CCO_0.01/hybrid_nn/structures/hybrid_nn_initial.html
+生成了 2 个 HTML 文件
+
+处理目录：./output/CCO_0.01/pyberny/structures
+找到 2 个 XYZ 文件
+分子结构图已保存：./output/CCO_0.01/pyberny/structures/pyberny_final.html
+分子结构图已保存：./output/CCO_0.01/pyberny/structures/pyberny_initial.html
+生成了 2 个 HTML 文件
+
+处理目录：./output/CCO_0.01/pyberny_multi/structures
+找到 2 个 XYZ 文件
+分子结构图已保存：./output/CCO_0.01/pyberny_multi/structures/pyberny_final.html
+分子结构图已保存：./output/CCO_0.01/pyberny_multi/structures/pyberny_initial.html
+生成了 2 个 HTML 文件
+
+处理目录：./output/my_CCCC/hybrid_gpr/structures
+找到 2 个 XYZ 文件
+分子结构图已保存：./output/my_CCCC/hybrid_gpr/structures/hybrid_gpr_final.html
+分子结构图已保存：./output/my_CCCC/hybrid_gpr/structures/hybrid_gpr_initial.html
+生成了 2 个 HTML 文件
+
+处理目录：./output/my_CCCC/hybrid_nn/structures
+找到 2 个 XYZ 文件
+分子结构图已保存：./output/my_CCCC/hybrid_nn/structures/hybrid_nn_final.html
+分子结构图已保存：./output/my_CCCC/hybrid_nn/structures/hybrid_nn_initial.html
+生成了 2 个 HTML 文件
+
+处理目录：./output/my_CCCC/pyberny/structures
+找到 2 个 XYZ 文件
+分子结构图已保存：./output/my_CCCC/pyberny/structures/pyberny_final.html
+分子结构图已保存：./output/my_CCCC/pyberny/structures/pyberny_initial.html
+生成了 2 个 HTML 文件
+
+处理目录：./output/my_CCCC/pyberny_multi/structures
+找到 2 个 XYZ 文件
+分子结构图已保存：./output/my_CCCC/pyberny_multi/structures/pyberny_final.html
+分子结构图已保存：./output/my_CCCC/pyberny_multi/structures/pyberny_initial.html
+生成了 2 个 HTML 文件
+
+============================================================
+总计生成了 24 个 HTML 文件
+提示：用浏览器打开 HTML 文件可查看交互式 3D 分子结构。

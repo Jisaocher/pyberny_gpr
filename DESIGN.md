@@ -34,7 +34,7 @@
 | AI 方法 | 模型类型 | 预测目标 | 状态 |
 |--------|---------|---------|------|
 | `gpr` | 高斯过程回归 | 梯度 | ✅ 已实现 |
-| `neural_network` | 神经网络 | 梯度 | 🔲 可扩展 |
+| `nn` | 神经网络 | 能量 + 梯度 | ✅ 已实现 |
 
 ---
 
@@ -51,6 +51,7 @@ pyberny_gpr/
 │   └── base.py                # 优化器基类
 ├── models/
 │   ├── energy_gradient_gpr.py # 能量 - 梯度 GPR 模型 ⭐
+│   ├── energy_gradient_nn.py  # 能量 - 梯度神经网络模型 ⭐
 │   └── gpr_base.py            # AI 模型抽象基类
 ├── core/
 │   ├── molecule.py            # 分子数据结构
@@ -75,14 +76,21 @@ pyberny_gpr/
 ┌──────────────────┐  ┌──────────────────┐
 │ PyBernyOptimizer │  │ EnergyGradientGPR│
 │ (外层 BFGS)       │  │ (内层预测)       │
-└──────────────────┘  └──────────────────┘
-           │                  │
-           └────────┬─────────┘
-                    ▼
-          ┌──────────────────┐
-          │ QuantumCalculator│
-          │ (PySCF 后端)      │
-          └──────────────────┘
+│                  │  │                  │
+│                  │  └──────────────────┘
+│                  │           ▲
+│                  │           │
+│                  │  ┌──────────────────┐
+│                  └──│EnergyGradientNN  │
+│                     │ (内层预测)        │
+│                     └──────────────────┘
+└──────────────────┘
+           │
+           ▼
+  ┌──────────────────┐
+  │ QuantumCalculator│
+  │ (PySCF 后端)      │
+  └──────────────────┘
 ```
 
 ### 2.3 算法流程
@@ -94,7 +102,7 @@ while round_num < max_rounds:
     # 第 1 轮：n_init + outer_steps 步（融合初始采样）
     # 后续轮：outer_steps 步
     outer_result = self._run_outer_bfgs(
-        coords, 
+        coords,
         is_first_round=(round_num == 1)
     )
 
@@ -106,7 +114,7 @@ while round_num < max_rounds:
 
     # 步骤 4: 择优选择（综合能量和梯度）
     best_candidate = self._select_best_candidate(
-        outer_result, 
+        outer_result,
         inner_result
     )
 
@@ -185,7 +193,34 @@ $$\nabla f(\mathbf{x}^*) = \frac{\partial}{\partial \mathbf{x}^*} k(\mathbf{x}^*
 
 ---
 
-### 3.4 量子化学计算
+### 3.4 神经网络模型
+
+**网络结构**:
+
+```
+输入 (3N) → 共享隐藏层 → 能量头 → E (标量)
+                        → 梯度头 → g (3N 维)
+```
+
+**损失函数**:
+
+$$L = w_E \cdot \text{MSE}(E_{\text{pred}}, E_{\text{true}}) + w_g \cdot \text{MSE}(\mathbf{g}_{\text{pred}}, \mathbf{g}_{\text{true}})$$
+
+**NN 参数**:
+| 参数 | 含义 | 默认值 |
+|------|------|--------|
+| `hidden_layers` | 隐藏层神经元数 | [128, 64, 32] |
+| `activation` | 激活函数 | relu |
+| `learning_rate` | 学习率 | 0.001 |
+| `batch_size` | 批次大小 | 16 |
+| `max_epochs` | 最大训练轮数 | 500 |
+| `early_stopping_patience` | 早停耐心值 | 50 |
+| `energy_weight` | 能量损失权重 | 1.0 |
+| `gradient_weight` | 梯度损失权重 | 0.1 |
+
+---
+
+### 3.5 量子化学计算
 
 **计算方法配置**:
 
@@ -233,21 +268,21 @@ class BaseGPRModel(ABC):
     def train(self, X, y, gradients) -> None:
         """训练模型"""
         pass
-    
+
     @abstractmethod
     def predict(self, x) -> Tuple[float, float]:
         """预测能量（均值和方差）"""
         pass
-    
+
     @abstractmethod
     def predict_gradient(self, x) -> np.ndarray:
         """预测梯度"""
         pass
-    
+
     def add_data(self, x, energy, gradient) -> None:
         """添加训练数据"""
         pass
-    
+
     def clear_data(self) -> None:
         """清除训练数据"""
         pass
@@ -324,8 +359,8 @@ $$\|\mathbf{g}\| < \text{threshold} = 10^{-4}$$
 ### 7.1 混合策略参数
 
 | 参数 | 含义 | 默认值 | 建议范围 |
-|------|------|--------|---------|
-| `hybrid.ai_method` | AI 方法类型 | `gpr` | `gpr` |
+|------|------|--------|----------|
+| `hybrid.ai_method` | AI 方法类型 | `gpr` | `gpr`, `nn` |
 | `hybrid.outer_steps` | 外层步数 | 10 | 10-15 |
 | `hybrid.inner_steps` | 内层步数 | 5 | 3-5 |
 | `hybrid.validate_every` | 验证频率 | 0 | 0（仅验证最后一点） |
@@ -345,7 +380,7 @@ $$\text{step} = \text{base\_step} \times (0.1 + \|\mathbf{g}\| \times \text{adap
 ### 7.3 择优权重
 
 | 参数 | 含义 | 默认值 | 建议范围 |
-|------|------|--------|---------|
+|------|------|--------|----------|
 | `energy_weight` | 能量权重 | 0.3 | 0.2-0.5 |
 | `gradient_weight` | 梯度权重 | 0.7 | 0.5-0.8 |
 
@@ -365,7 +400,8 @@ main()
               │     │           └── 量子化学计算 (PySCF)
               │     │
               │     ├── _train_ai_model()
-              │     │     └── EnergyGradientGPR.train()
+              │     │     ├── EnergyGradientGPR.train()
+              │     │     └── 或 EnergyGradientNN.fit()
               │     │
               │     ├── _run_inner_exploration()
               │     │     └── AI 模型.predict_gradient()
@@ -391,29 +427,27 @@ main()
 
 ### 9.2 注册新的 AI 方法
 
-1. 在 `config/default_config.yaml` 中添加新的 `ai_method` 选项
-2. 在 `main.py` 的 `--ai_method` 参数中添加 `choices`
-3. 在 `HybridOptimizer._initialize_ai_model()` 中添加初始化逻辑
+1. 在 `models/__init__.py` 中添加可选依赖导入
+2. 在 `config/default_config.yaml` 中添加新的 `ai_method` 选项
+3. 在 `main.py` 的 `--ai_method` 参数中添加 `choices`
+4. 在 `HybridOptimizer._initialize_ai_model()` 中添加初始化逻辑
 
-### 9.3 示例：神经网络
+### 9.3 可选依赖模式
 
 ```python
-# models/neural_network.py
-from models.gpr_base import BaseGPRModel
+# models/__init__.py
+try:
+    from models.energy_gradient_new import EnergyGradientNew
+    NEW_AVAILABLE = True
+except ImportError:
+    EnergyGradientNew = None
+    NEW_AVAILABLE = False
 
-class NeuralNetworkModel(BaseGPRModel):
-    def __init__(self, config, dim):
-        super().__init__(config)
-        self.name = "NeuralNetwork"
-        # 初始化神经网络...
-    
-    def train(self, X, y, gradients):
-        # 训练神经网络...
-        pass
-    
-    def predict_gradient(self, x):
-        # 预测梯度...
-        pass
+# optimizers/hybrid.py
+elif self.ai_method == 'new':
+    if not NEW_AVAILABLE:
+        raise ImportError("使用新方法需要安装 xxx...")
+    return EnergyGradientNew(self.config, dim)
 ```
 
 ---
@@ -429,6 +463,7 @@ class NeuralNetworkModel(BaseGPRModel):
 | **梯度预测** | AI 模型直接预测梯度，符合优化目标 |
 | **自适应步长** | 梯度越大步长越大，适合初期快速探索 |
 | **多 AI 方法支持** | 可扩展神经网络等其他 AI 方法 |
+| **可选依赖** | torch 为可选依赖，无 torch 环境仍可使用 GPR |
 
 ---
 
@@ -437,9 +472,10 @@ class NeuralNetworkModel(BaseGPRModel):
 | 场景 | 推荐方法 | 说明 |
 |------|---------|------|
 | 小分子快速优化 | `pyberny` | 直接 BFGS，无需 AI 代理 |
-| 大分子优化 | `hybrid` | AI 加速，节省计算成本 |
+| 大分子优化 | `hybrid` + `gpr` | AI 加速，节省计算成本 |
 | 高精度需求 | `hybrid` + 小 `local_radius` | 精细探索 |
 | 快速筛选 | `hybrid` + 大 `inner_steps` | 更多 AI 探索 |
+| 大数据场景 | `hybrid` + `nn` | 神经网络扩展性强 |
 
 ---
 

@@ -20,7 +20,8 @@ L-BFGS-AI 混合优化策略（融合版）
 
 支持的 AI 方法：
 - gpr: 梯度预测 GPR（默认）
-- 可扩展其他 AI 方法（如神经网络等）
+- nn: 神经网络（能量 - 梯度联合预测）
+- 可扩展其他 AI 方法（如 KRR、SVR 等）
 """
 import numpy as np
 from typing import Dict, Any, Optional, Tuple, List
@@ -31,6 +32,7 @@ from core.calculator import QuantumCalculator
 from optimizers.base import BaseOptimizer
 from models.energy_gradient_gpr import EnergyGradientGPR
 from models.gpr_base import BaseGPRModel
+from models import NN_AVAILABLE, EnergyGradientNN
 
 
 class HybridOptimizer(BaseOptimizer):
@@ -41,12 +43,13 @@ class HybridOptimizer(BaseOptimizer):
     1. 第 1 轮外层：使用 n_init + outer_steps 步 PyBerny 真实计算（融合初始采样）
     2. 训练 AI 模型：使用滑动窗口管理训练数据
     3. 内层探索：AI 预测 + 自研梯度下降法，快速探索
-    4. 验证择优：选择最优起点进行下一轮
+    4. 验证择优：从内外层结果中选择最优作为下一轮起点
     5. 后续轮次：外层 outer_steps 步 + 内层探索 + 择优
 
     支持的 AI 方法：
     - gpr: 梯度预测 GPR（默认）
-    - 可扩展其他 AI 方法（如神经网络等）
+    - nn: 神经网络（能量 - 梯度联合预测）
+    - 可扩展其他 AI 方法（如 KRR、SVR 等）
     """
 
     def __init__(self, config: Dict[str, Any]):
@@ -67,8 +70,8 @@ class HybridOptimizer(BaseOptimizer):
         # AI 方法选择
         self.ai_method = hybrid_config.get('ai_method', 'gpr')
 
-        # GPR 初始采样点数（用于第 1 轮外层迭代）
-        self.n_init = config.get('gpr', {}).get('n_init', 5)
+        # GPR 初始采样点数（用于第 1 轮外层迭代，供 AI 方法通用）
+        self.n_init = hybrid_config.get('n_init', 5)
 
         # 内层优化配置（自研梯度下降法）
         inner_opt_config = hybrid_config.get('inner_opt', {})
@@ -139,6 +142,19 @@ class HybridOptimizer(BaseOptimizer):
             if self.config.get('optimizer', {}).get('verbose', True):
                 print(f"使用 AI 方法：GPR (梯度预测)")
             return EnergyGradientGPR(self.config, dim)
+
+        elif self.ai_method == 'nn':
+            # 神经网络
+            if not NN_AVAILABLE:
+                raise ImportError(
+                    "错误：使用神经网络方法需要安装 torch。\n"
+                    "请运行：pip install torch\n"
+                    "或者使用 --ai_method gpr 来使用 GPR 方法"
+                )
+            if self.config.get('optimizer', {}).get('verbose', True):
+                print(f"使用 AI 方法：Neural Network (能量 - 梯度联合预测)")
+            return EnergyGradientNN(self.config, dim)
+
         else:
             # 默认使用 GPR
             if self.config.get('optimizer', {}).get('verbose', True):
@@ -178,8 +194,14 @@ class HybridOptimizer(BaseOptimizer):
 
         # 打印开始信息
         if self.config.get('optimizer', {}).get('verbose', True):
+            # 根据 AI 方法动态生成标题
+            ai_method_names = {
+                'gpr': 'GPR',
+                'nn': 'Neural Network'
+            }
+            ai_method_name = ai_method_names.get(self.ai_method, self.ai_method.upper())
             print("=" * 70)
-            print("PyBerny-GPR 混合优化开始")
+            print(f"PyBerny-{ai_method_name} 混合优化开始")
             print("=" * 70)
             print(f"外层步数：{self.outer_steps}（第 1 轮：{self.n_init + self.outer_steps} 步）")
             print(f"内层步数：{self.inner_steps}")
@@ -430,11 +452,11 @@ class HybridOptimizer(BaseOptimizer):
 
     def _train_gpr(self) -> None:
         """
-        阶段 2B: 训练 GPR 模型
+        阶段 2B: 训练 AI 模型
 
-        使用最近的外层迭代数据训练（按能量筛选）
+        使用最近的外层迭代数据训练（按梯度筛选）
         """
-        # 限制训练数据量（只保留最近的外层迭代 + 按能量筛选）
+        # 限制训练数据量（只保留最近的外层迭代 + 按梯度筛选）
         self._limit_training_data()
 
         # 转换为 numpy 数组
@@ -448,7 +470,10 @@ class HybridOptimizer(BaseOptimizer):
         for i in range(len(X)):
             self.ai_model.add_data(X[i], y[i], gradients[i])
 
-        if hasattr(self.ai_model, 'train'):
+        # 训练 AI 模型（优先使用 fit 方法，兼容旧版 train 方法）
+        if hasattr(self.ai_model, 'fit'):
+            self.ai_model.fit(X, y, gradients)
+        elif hasattr(self.ai_model, 'train'):
             self.ai_model.train(X, y, gradients)
 
     def _limit_training_data(self) -> None:
@@ -514,10 +539,10 @@ class HybridOptimizer(BaseOptimizer):
 
     def _run_inner_exploration(self, outer_result: Dict[str, Any]) -> Dict[str, Any]:
         """
-        阶段 2C: 内层 GPR 探索（自研梯度下降法）
+        阶段 2C: 内层 AI 探索（自研梯度下降法）
 
-        使用 GPR 预测梯度 + 梯度下降法快速探索
-        GPR 只预测梯度，不预测能量
+        使用 AI 模型预测梯度 + 梯度下降法快速探索
+        AI 模型只预测梯度，不预测能量
         记录每一步的预测梯度到历史
         仅在内层最后一步计算真实能量和梯度
 
@@ -530,7 +555,7 @@ class HybridOptimizer(BaseOptimizer):
         verbose = self.config.get('optimizer', {}).get('verbose', True)
 
         if verbose:
-            print(f"\n[内层探索] 执行 {self.inner_steps} 步（GPR 预测梯度，梯度下降法）...")
+            print(f"\n[内层探索] 执行 {self.inner_steps} 步（AI 预测梯度，梯度下降法）...")
             print(f"内层起点：E={outer_result['energy']:.8f}, |g|={np.linalg.norm(outer_result['gradient']):.6f}")
 
         # 从外层终点开始内层探索
@@ -797,7 +822,7 @@ class HybridOptimizer(BaseOptimizer):
         total_pyscf_calls = self.outer_pyscf_calls + self.inner_pyscf_calls
 
         print(f"PySCF 调用次数：{total_pyscf_calls} (外层：{self.outer_pyscf_calls}, 内层验证：{self.inner_pyscf_calls})")
-        print(f"内层探索步数：{self.current_round * self.inner_steps}（使用 GPR 预测，节省 PySCF 计算）")
+        print(f"内层探索步数：{self.current_round * self.inner_steps}（使用 AI 预测，节省 PySCF 计算）")
         print("=" * 70)
 
     def step(self, coords_flat: np.ndarray) -> Tuple[np.ndarray, float, np.ndarray]:

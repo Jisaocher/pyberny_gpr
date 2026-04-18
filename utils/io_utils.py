@@ -20,7 +20,8 @@ class OutputManager:
     """
     
     def __init__(self, save_dir: str, format: str = 'json',
-                 ai_method: str = None, method_name: str = None):
+                 ai_method: str = None, method_name: str = None,
+                 multi_start: bool = False):
         """
         初始化输出管理器
 
@@ -29,19 +30,25 @@ class OutputManager:
             format: 输出格式 ('json', 'csv', 'npy')
             ai_method: AI 方法类型（'gpr' 等）
             method_name: 优化方法名称（'pyberny'/'hybrid'）
+            multi_start: 是否启用多起点策略（仅 pyberny 模式）
         """
         self.save_dir = save_dir
         self.format = format
         self.ai_method = ai_method
         self.method_name = method_name
+        self.multi_start = multi_start
 
         # 确定方法专用目录：output/{smiles}_{perturb}/{method}/
         # 混合策略：添加 AI 方法信息，如 output/{smiles}_{perturb}/hybrid_gpr/
+        # 多起点策略：添加 _multi 后缀，如 output/{smiles}_{perturb}/pyberny_multi/
         if method_name:
             if method_name == 'hybrid' and ai_method:
                 # 混合策略：方法名包含 AI 方法信息
                 ai_suffix = self._get_ai_method_suffix() if ai_method else ai_method
                 self.method_dir = os.path.join(save_dir, f"{method_name}_{ai_suffix}")
+            elif method_name == 'pyberny' and multi_start:
+                # 多起点策略：添加 _multi 后缀
+                self.method_dir = os.path.join(save_dir, f"{method_name}_multi")
             else:
                 self.method_dir = os.path.join(save_dir, method_name)
         else:
@@ -453,7 +460,8 @@ class OutputManager:
 
 def create_output_manager(config: Dict[str, Any],
                           ai_method: str = None,
-                          method_name: str = None) -> OutputManager:
+                          method_name: str = None,
+                          multi_start: bool = False) -> OutputManager:
     """
     便捷函数：创建输出管理器
 
@@ -461,6 +469,7 @@ def create_output_manager(config: Dict[str, Any],
         config: 配置字典
         ai_method: AI 方法类型（'simple'/'gradient'/'random_forest'等）
         method_name: 优化方法名称（'pyberny'/'hybrid'）
+        multi_start: 是否启用多起点策略（仅 pyberny 模式）
 
     Returns:
         OutputManager
@@ -469,4 +478,5 @@ def create_output_manager(config: Dict[str, Any],
     save_dir = output_config.get('save_dir', './output')
     format = output_config.get('format', 'json')
 
-    return OutputManager(save_dir, format, ai_method=ai_method, method_name=method_name)
+    return OutputManager(save_dir, format, ai_method=ai_method, method_name=method_name,
+                        multi_start=multi_start)

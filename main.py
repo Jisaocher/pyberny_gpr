@@ -199,8 +199,10 @@ def main():
     parser.add_argument('--xyz_name', type=str, default=None,
                        help='自建优化对应的文件层级命名（与 --xyz_path 同时使用）')
     parser.add_argument('--ai_method', type=str, default=None,
-                       choices=['gpr'],
-                       help='AI 方法类型（仅当 --method 为 hybrid 时使用）: gpr (梯度预测 GPR)，可扩展其他方法')
+                       choices=['gpr', 'nn'],
+                       help='AI 方法类型（仅当 --method 为 hybrid 时使用）: gpr (梯度预测 GPR), nn (神经网络)')
+    parser.add_argument('--multi', action='store_true', default=None,
+                       help='是否启用多起点策略（仅当 --method 为 pyberny 时使用）: 默认 false=原始单次优化，true=多轮策略')
 
     args = parser.parse_args()
 
@@ -222,6 +224,12 @@ def main():
         if 'optimizer' not in config:
             config['optimizer'] = {}
         config['optimizer']['convergence_threshold'] = args.threshold
+
+    # 多起点策略设置
+    if args.multi is not None:
+        if 'berny' not in config:
+            config['berny'] = {}
+        config['berny']['multi_start'] = args.multi
 
     # 分子设置
     if 'molecule' not in config:
@@ -294,9 +302,11 @@ def main():
         # 使用 xyz_name 作为目录名
         dir_name = xyz_name
         config['output']['save_dir'] = os.path.join(original_save_dir, dir_name)
-        
-        # 创建输出管理器
-        output_manager = create_output_manager(config, ai_method=ai_method, method_name=args.method)
+
+        # 创建输出管理器（传入 multi_start 参数）
+        multi_start = config.get('berny', {}).get('multi_start', False) if args.method == 'pyberny' else False
+        output_manager = create_output_manager(config, ai_method=ai_method, method_name=args.method,
+                                               multi_start=multi_start)
 
         print(f"\n{'='*70}")
         print("PyBerny-GPR 混合优化项目")
@@ -321,8 +331,10 @@ def main():
         dir_name = f"{smiles}_{perturb_str}"
         config['output']['save_dir'] = os.path.join(original_save_dir, dir_name)
 
-        # 创建输出管理器
-        output_manager = create_output_manager(config, ai_method=ai_method, method_name=args.method)
+        # 创建输出管理器（传入 multi_start 参数）
+        multi_start = config.get('berny', {}).get('multi_start', False) if args.method == 'pyberny' else False
+        output_manager = create_output_manager(config, ai_method=ai_method, method_name=args.method,
+                                               multi_start=multi_start)
 
         print(f"\n{'='*70}")
         print("PyBerny-GPR 混合优化项目")

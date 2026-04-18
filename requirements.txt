@@ -8,3 +8,10 @@ pyyaml>=6.0
 ase>=3.22.0
 zhplot>=0.1.0
 py3Dmol>=2.0.0  # 交互式 3D 分子可视化
+
+# 可选依赖（仅当使用神经网络方法时需要）
+# CPU 版本（推荐，快速安装）:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+# GPU 版本（需要 CUDA）:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu118
+# torch>=1.9.0  # 使用 --ai_method nn 时启用

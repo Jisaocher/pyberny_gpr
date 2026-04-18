@@ -12,7 +12,7 @@
 | **联系邮箱** | 3266048598@qq.com |
 | **研究日期** | 2026 |
 | **项目类型** | 计算化学 + 人工智能（机器学习） |
-| **项目路径** | `/mnt/e/wsl_dir/pyberny_gpr/` |
+| **项目路径** | `./pyberny_gpr/` |
 
 ---
 
@@ -44,7 +44,7 @@
 | AI 方法 | 说明 | 状态 |
 |--------|------|------|
 | `gpr` | 梯度预测高斯过程回归 | ✅ 已实现（默认） |
-| `neural_network` | 神经网络预测 | 🔲 可扩展 |
+| `nn` | 神经网络（能量 - 梯度联合预测） | ✅ 已实现（需安装 torch） |
 
 ---
 
@@ -53,8 +53,17 @@
 ### 1. 安装依赖
 
 ```bash
-cd /mnt/e/wsl_dir/pyberny_gpr
+cd ./pyberny_gpr
 pip install -r requirements.txt
+```
+
+**使用神经网络方法？** 需要先安装 PyTorch：
+```bash
+# CPU 版本（推荐，快速安装）
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+# GPU 版本（需要 CUDA）
+pip install torch --index-url https://download.pytorch.org/whl/cu118
 ```
 
 ### 2. 运行优化
@@ -69,7 +78,10 @@ python main.py --method hybrid --molecule ethanol --perturb 0.1
 # 方法 3: 指定 AI 方法
 python main.py --method hybrid --molecule ethanol --perturb 0.1 --ai_method gpr
 
-# 方法 4: 从 XYZ 文件读取初始构型
+# 方法 4: 使用神经网络（需要先安装 torch）
+python main.py --method hybrid --molecule ethanol --perturb 0.1 --ai_method nn
+
+# 方法 5: 从 XYZ 文件读取初始构型
 python main.py --xyz_path ./config/initial.xyz --xyz_name my_mol --method hybrid
 ```
 
@@ -86,7 +98,7 @@ output/
 │       ├── structures/
 │       └── plots/
 
-# 3D 分子结构可视化
+# 3D 分子结构可视化（递归查找所有 structures 目录）
 python draw_structure3D.py
 ```
 
@@ -108,7 +120,8 @@ pyberny_gpr/
 │
 ├── models/                     # AI 模型模块
 │   ├── gpr_base.py            # GPR 基类（统一接口）
-│   └── energy_gradient_gpr.py # 能量 - 梯度 GPR 模型 ⭐
+│   ├── energy_gradient_gpr.py # 能量 - 梯度 GPR 模型 ⭐
+│   └── energy_gradient_nn.py  # 能量 - 梯度神经网络模型 ⭐
 │
 ├── visualization/              # 可视化模块
 │   ├── structure3d.py         # 3D 分子结构可视化（py3Dmol）
@@ -152,6 +165,12 @@ pyberny_gpr/
 
 混合方法的外层优化与基准方法使用**完全相同的 berny 配置**，确保公平对比。
 
+### 4. 多 AI 方法支持
+
+- **GPR**：梯度预测高斯过程回归（默认，小数据高效）
+- **神经网络**：能量 - 梯度联合预测（可扩展，适合大数据）
+- **可选依赖**：torch 为可选依赖，无 torch 环境仍可正常使用 GPR 方法
+
 ---
 
 ## 技术栈
@@ -161,7 +180,7 @@ pyberny_gpr/
 | **量子化学** | PySCF, berny |
 | **分子处理** | RDKit, ASE |
 | **优化算法** | berny (完整 BFGS) |
-| **机器学习** | scikit-learn (GPR) |
+| **机器学习** | scikit-learn (GPR), PyTorch (NN) |
 | **可视化** | Matplotlib, py3Dmol |
 | **配置管理** | PyYAML |
 
@@ -205,7 +224,7 @@ hybrid:
   ai_method: "gpr"           # AI 方法类型
   outer_steps: 10            # 外层步数（第 1 轮：15 步 = 5+10）
   inner_steps: 5             # 内层探索步数
-  
+
   # 择优权重（推荐 gradient_weight > energy_weight）
   selection_weights:
     energy_weight: 0.3
@@ -284,7 +303,7 @@ output/
 
 **维护者**: 刘喆 (Liu Zhe)  
 **邮箱**: 3266048598@qq.com  
-**项目目录**: `/mnt/e/wsl_dir/pyberny_gpr/`
+**项目目录**: `./pyberny_gpr/`
 
 ---
 

@@ -21,7 +21,7 @@ optimizer:
   convergence_threshold: 1.0e-4  # 梯度收敛阈值（实际可达成）
   verbose: true            # 是否输出详细信息
 
-# PyBerny 基准方法设置（完整 BFGS，一次性运行）
+# PyBerny 基准方法设置
 berny:
   maxsteps: 500            # 最大优化步数
   trust: 0.3               # 初始信任半径 (Å)
@@ -29,10 +29,14 @@ berny:
   gradient_threshold: 1e-4 # 梯度收敛阈值 (Hartree/Å)
   displacement_threshold: 1e-3  # 位移收敛阈值 (Å)
   debug: false             # 调试模式
+  multi_start: false       # 是否启用多起点策略（默认 false=原始单次优化）
+                           # true=使用多轮策略，还原混合方法的起点更新操作
+                           # 第一轮迭代 n_init+outer_steps 次，后续每轮 outer_steps 次
+                           # 每轮终点作为下一轮起点，从缓存读取能量/梯度（不额外计算）
+                           # 累计真实能量/梯度计算次数，与混合策略对齐
 
 # GPR 设置
 gpr:
-  n_init: 5                # 初始采样点数（减少以加快训练）
   type: "gradient_predicting"  # AI 方法类型（唯一推荐）：
                                #   - gradient_predicting: 梯度预测 GPR（直接预测梯度，向梯度下降方向预测）
   local_radius: 0.1        # 局部搜索半径 (Å)（0.2→0.1，更小范围）
@@ -63,9 +67,12 @@ selection_weights:
 # 混合策略设置（新版：外层 + 内层）
 hybrid:
   # AI 方法选择（支持多种 AI 方法）
-  ai_method: "gpr"          # AI 方法类型：gpr (梯度预测 GPR), 可扩展其他方法
+  ai_method: "gpr"          # AI 方法类型：gpr (梯度预测 GPR), nn (神经网络)
                             # 仅当 --method 为 hybrid 时使用
                             # 若命令行未指定 --ai_method，则使用此默认值
+
+  # 初始采样点数（供 AI 方法通用）
+  n_init: 5                 # 初始采样点数（减少以加快训练）
 
   # 内外层步数
   outer_steps: 10           # 外层 L-BFGS 步数（真实计算，收集训练数据）
@@ -106,6 +113,33 @@ hybrid:
     max_rounds: 50           # 最大优化轮数
     max_no_improvement: 50   # 连续多少轮无显著改进则早停
     no_improvement_threshold: 1.0e-6  # 梯度改进阈值（小于此值认为无改进）
+
+# 神经网络配置（当 ai_method="nn" 时使用）
+neural_network:
+  # 网络结构
+  hidden_layers: [128, 64, 32]    # 隐藏层神经元数
+  activation: "relu"              # 激活函数：relu, tanh, gelu, elu
+  use_batchnorm: true             # 是否使用批归一化
+  dropout_rate: 0.1               # Dropout 比率
+  
+  # 训练参数
+  learning_rate: 0.001            # 学习率
+  batch_size: 16                  # 批次大小
+  max_epochs: 500                 # 最大训练轮数
+  early_stopping_patience: 50     # 早停耐心值
+  validation_split: 0.2           # 验证集比例
+  
+  # 损失函数权重
+  energy_weight: 1.0              # 能量损失权重
+  gradient_weight: 0.1            # 梯度损失权重（梯度惩罚）
+  
+  # 优化器
+  optimizer: "adam"               # 优化器：adam, adamw, sgd
+  weight_decay: 0.01              # 权重衰减（L2 正则化）
+  
+  # 数据归一化
+  normalize_input: true           # 输入归一化
+  normalize_output: true          # 输出归一化
 
 # 输出设置
 output:

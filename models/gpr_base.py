@@ -23,10 +23,12 @@ class BaseGPRModel(ABC):
         """
         self.config = config
         self.name = "BaseGPRModel"
-        
+
         # GPR 参数
         gpr_config = config.get('gpr', {})
-        self.n_init = gpr_config.get('n_init', 10)
+        # n_init 从 hybrid 配置中读取（供 AI 方法通用）
+        hybrid_config = config.get('hybrid', {})
+        self.n_init = hybrid_config.get('n_init', gpr_config.get('n_init', 10))
         self.local_radius = gpr_config.get('local_radius', 0.5)
         self.xi = gpr_config.get('xi', 0.01)  # EI 探索参数
         self.lambda_grad = gpr_config.get('lambda_grad', 0.1)  # 梯度惩罚
