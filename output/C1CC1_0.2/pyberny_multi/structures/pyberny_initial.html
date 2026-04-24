@@ -13,8 +13,8 @@
         <body>
             <h1>pyberny_initial</h1>
             <div class="container">
-                <div id="3dmolviewer_1776502346964794"  style="position: relative; width: 800px; height: 600px;">
-        <p id="3dmolwarning_1776502346964794" style="background-color:#ffcccc;color:black">3Dmol.js failed to load for some reason.  Please check your browser console for error messages.<br></p>
+                <div id="3dmolviewer_1777007715452905"  style="position: relative; width: 800px; height: 600px;">
+        <p id="3dmolwarning_1777007715452905" style="background-color:#ffcccc;color:black">3Dmol.js failed to load for some reason.  Please check your browser console for error messages.<br></p>
         </div>
 <script>
 
@@ -45,18 +45,18 @@ $3Dmolpromise = null;
   $3Dmolpromise = loadScriptAsync('https://cdn.jsdelivr.net/npm/3dmol@2.5.4/build/3Dmol-min.js');
 }
 
-var viewer_1776502346964794 = null;
-var warn = document.getElementById("3dmolwarning_1776502346964794");
+var viewer_1777007715452905 = null;
+var warn = document.getElementById("3dmolwarning_1777007715452905");
 if(warn) {
     warn.parentNode.removeChild(warn);
 }
 $3Dmolpromise.then(function() {
-viewer_1776502346964794 = $3Dmol.createViewer(document.getElementById("3dmolviewer_1776502346964794"),{backgroundColor:"white"});
-viewer_1776502346964794.zoomTo();
-	viewer_1776502346964794.addModel("9\nmolecule_C1CC1\nC     -0.642010    -0.433633     0.097417\nC     -0.206488     0.680936    -0.231224\nC      0.650292    -0.029567     0.142107\nH     -1.058598    -1.155201     1.097211\nH     -0.743841    -1.315983    -1.022961\nH     -0.711883     1.381193     0.768491\nH     -0.265625     1.282034    -1.024494\nH      1.341036    -0.499181    -0.829799\nH      1.350200    -0.159151     0.940646","xyz");
-	viewer_1776502346964794.setStyle({"sphere": {"scale": 0.3}, "stick": {"radius": 0.15}});
-	viewer_1776502346964794.zoomTo();
-viewer_1776502346964794.render();
+viewer_1777007715452905 = $3Dmol.createViewer(document.getElementById("3dmolviewer_1777007715452905"),{backgroundColor:"white"});
+viewer_1777007715452905.zoomTo();
+	viewer_1777007715452905.addModel("9\nmolecule_C1CC1\nC     -0.642010    -0.433633     0.097417\nC     -0.206488     0.680936    -0.231224\nC      0.650292    -0.029567     0.142107\nH     -1.058598    -1.155201     1.097211\nH     -0.743841    -1.315983    -1.022961\nH     -0.711883     1.381193     0.768491\nH     -0.265625     1.282034    -1.024494\nH      1.341036    -0.499181    -0.829799\nH      1.350200    -0.159151     0.940646","xyz");
+	viewer_1777007715452905.setStyle({"sphere": {"scale": 0.3}, "stick": {"radius": 0.15}});
+	viewer_1777007715452905.zoomTo();
+viewer_1777007715452905.render();
 });
 </script>
             </div>

@@ -1,0 +1,65 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>pyberny_final</title>
+            <style>
+                body { font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 20px; }
+                h1 { color: #2c3e50; margin-top: 20px; }
+                .container { display: flex; justify-content: center; align-items: center; }
+            </style>
+        </head>
+        <body>
+            <h1>pyberny_final</h1>
+            <div class="container">
+                <div id="3dmolviewer_17770077155033739"  style="position: relative; width: 800px; height: 600px;">
+        <p id="3dmolwarning_17770077155033739" style="background-color:#ffcccc;color:black">3Dmol.js failed to load for some reason.  Please check your browser console for error messages.<br></p>
+        </div>
+<script>
+
+var loadScriptAsync = function(uri){
+  return new Promise((resolve, reject) => {
+    //this is to ignore the existence of requirejs amd
+    var savedexports, savedmodule;
+    if (typeof exports !== 'undefined') savedexports = exports;
+    else exports = {}
+    if (typeof module !== 'undefined') savedmodule = module;
+    else module = {}
+
+    var tag = document.createElement('script');
+    tag.src = uri;
+    tag.async = true;
+    tag.onload = () => {
+        exports = savedexports;
+        module = savedmodule;
+        resolve();
+    };
+  var firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+});
+};
+
+if(typeof $3Dmolpromise === 'undefined') {
+$3Dmolpromise = null;
+  $3Dmolpromise = loadScriptAsync('https://cdn.jsdelivr.net/npm/3dmol@2.5.4/build/3Dmol-min.js');
+}
+
+var viewer_17770077155033739 = null;
+var warn = document.getElementById("3dmolwarning_17770077155033739");
+if(warn) {
+    warn.parentNode.removeChild(warn);
+}
+$3Dmolpromise.then(function() {
+viewer_17770077155033739 = $3Dmol.createViewer(document.getElementById("3dmolviewer_17770077155033739"),{backgroundColor:"white"});
+viewer_17770077155033739.zoomTo();
+	viewer_17770077155033739.addModel("15\nmolecule_CCCCO_best_pyberny\nC     -1.553910     0.811786     0.106129\nC     -0.769253    -0.373503     0.668142\nC      0.241479    -0.996421    -0.300512\nC      1.389001    -0.087556    -0.727172\nO      2.190897     0.329339     0.346979\nH     -2.081009     0.536113    -0.811584\nH     -2.299256     1.159073     0.825162\nH     -0.908705     1.662308    -0.128729\nH     -1.475219    -1.151660     0.971602\nH     -0.255186    -0.072402     1.587078\nH      0.672291    -1.886558     0.166473\nH     -0.280730    -1.333753    -1.203268\nH      2.048975    -0.637717    -1.397880\nH      1.015331     0.775321    -1.289362\nH      1.718307     0.960121     0.867572","xyz");
+	viewer_17770077155033739.setStyle({"sphere": {"scale": 0.3}, "stick": {"radius": 0.15}});
+	viewer_17770077155033739.zoomTo();
+viewer_17770077155033739.render();
+});
+</script>
+            </div>
+        </body>
+        </html>
+        

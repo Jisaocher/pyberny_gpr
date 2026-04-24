@@ -278,7 +278,7 @@ class HybridOptimizer(BaseOptimizer):
                 self.history.convergence_iteration = len(self.history) - 1
                 break
 
-            # 阶段 2B: 训练 GPR
+            # 阶段 2B: 训练 GPR（已兼容NN模型）
             self._train_gpr()
 
             # 阶段 2C: 内层探索（从外层终点开始，而不是起点！）

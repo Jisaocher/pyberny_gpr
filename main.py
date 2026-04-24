@@ -24,8 +24,13 @@ from utils.io_utils import OutputManager, create_output_manager
 
 def _get_ai_method_suffix(ai_method: str) -> str:
     """获取 AI 方法的简短后缀"""
-    # 目前只支持 gradient_predicting 一种 AI 方法
-    return 'gpr' if ai_method else ''
+    if not ai_method:
+        return ''
+    suffix_map = {
+        'gpr': 'gpr',
+        'nn': 'nn'
+    }
+    return suffix_map.get(ai_method, 'gpr')
 
 
 def load_config(config_path: str = None) -> Dict[str, Any]:
@@ -149,9 +154,23 @@ def run_optimization(method: str, molecule: Molecule, config: Dict[str, Any],
     plots_dir = os.path.join(output_manager.method_dir, 'plots')
 
     # 构建图表标题前缀
-    if ai_method:
+    # 区分不同策略：
+    # - 混合策略：pyberny_gpr / pyberny_nn
+    # - 基准策略：pyberny (单轮) / pyberny_multi (多轮)
+    if method == 'hybrid' and ai_method:
+        # 混合策略：根据 AI 方法区分
         ai_suffix = _get_ai_method_suffix(ai_method)
-        title_prefix = f"{method}_{ai_suffix} - "
+        if ai_suffix == 'nn':
+            title_prefix = "pyberny_nn - "
+        else:
+            title_prefix = "pyberny_gpr - "
+    elif method == 'pyberny':
+        # 基准策略：根据是否多起点区分
+        multi_start = config.get('berny', {}).get('multi_start', False)
+        if multi_start:
+            title_prefix = "pyberny_multi - "
+        else:
+            title_prefix = "pyberny - "
     else:
         title_prefix = f"{method} - "
 

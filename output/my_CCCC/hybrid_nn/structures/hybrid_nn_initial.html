@@ -13,8 +13,8 @@
         <body>
             <h1>hybrid_nn_initial</h1>
             <div class="container">
-                <div id="3dmolviewer_17765023471033003"  style="position: relative; width: 800px; height: 600px;">
-        <p id="3dmolwarning_17765023471033003" style="background-color:#ffcccc;color:black">3Dmol.js failed to load for some reason.  Please check your browser console for error messages.<br></p>
+                <div id="3dmolviewer_1777007715782067"  style="position: relative; width: 800px; height: 600px;">
+        <p id="3dmolwarning_1777007715782067" style="background-color:#ffcccc;color:black">3Dmol.js failed to load for some reason.  Please check your browser console for error messages.<br></p>
         </div>
 <script>
 
@@ -45,18 +45,18 @@ $3Dmolpromise = null;
   $3Dmolpromise = loadScriptAsync('https://cdn.jsdelivr.net/npm/3dmol@2.5.4/build/3Dmol-min.js');
 }
 
-var viewer_17765023471033003 = null;
-var warn = document.getElementById("3dmolwarning_17765023471033003");
+var viewer_1777007715782067 = null;
+var warn = document.getElementById("3dmolwarning_1777007715782067");
 if(warn) {
     warn.parentNode.removeChild(warn);
 }
 $3Dmolpromise.then(function() {
-viewer_17765023471033003 = $3Dmol.createViewer(document.getElementById("3dmolviewer_17765023471033003"),{backgroundColor:"white"});
-viewer_17765023471033003.zoomTo();
-	viewer_17765023471033003.addModel("14\nmy_CCCC\nC     -1.611191     0.525590     0.082095\nC     -0.508036    -0.678075    -0.819840\nC      0.550269    -0.519320     0.159815\nC      1.519909     0.426031     0.553073\nH     -0.949130     0.758950     0.711728\nH     -2.537772    -0.313555     0.457839\nH     -2.095003     0.958355    -0.680449\nH     -0.511953    -0.301315    -1.774464\nH     -1.004698    -1.448173    -0.836198\nH      0.420612    -1.016991     0.946552\nH      1.435987    -1.557012    -0.498001\nH      2.664656     0.555513     0.784499\nH      0.919747     1.058037     1.262048\nH      1.545860     1.082728    -0.571581","xyz");
-	viewer_17765023471033003.setStyle({"sphere": {"scale": 0.3}, "stick": {"radius": 0.15}});
-	viewer_17765023471033003.zoomTo();
-viewer_17765023471033003.render();
+viewer_1777007715782067 = $3Dmol.createViewer(document.getElementById("3dmolviewer_1777007715782067"),{backgroundColor:"white"});
+viewer_1777007715782067.zoomTo();
+	viewer_1777007715782067.addModel("14\nmy_CCCC\nC     -1.611191     0.525590     0.082095\nC     -0.508036    -0.678075    -0.819840\nC      0.550269    -0.519320     0.159815\nC      1.519909     0.426031     0.553073\nH     -0.949130     0.758950     0.711728\nH     -2.537772    -0.313555     0.457839\nH     -2.095003     0.958355    -0.680449\nH     -0.511953    -0.301315    -1.774464\nH     -1.004698    -1.448173    -0.836198\nH      0.420612    -1.016991     0.946552\nH      1.435987    -1.557012    -0.498001\nH      2.664656     0.555513     0.784499\nH      0.919747     1.058037     1.262048\nH      1.545860     1.082728    -0.571581","xyz");
+	viewer_1777007715782067.setStyle({"sphere": {"scale": 0.3}, "stick": {"radius": 0.15}});
+	viewer_1777007715782067.zoomTo();
+viewer_1777007715782067.render();
 });
 </script>
             </div>

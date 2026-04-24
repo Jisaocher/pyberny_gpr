@@ -13,8 +13,8 @@
         <body>
             <h1>hybrid_gpr_final</h1>
             <div class="container">
-                <div id="3dmolviewer_17765023470719728"  style="position: relative; width: 800px; height: 600px;">
-        <p id="3dmolwarning_17765023470719728" style="background-color:#ffcccc;color:black">3Dmol.js failed to load for some reason.  Please check your browser console for error messages.<br></p>
+                <div id="3dmolviewer_17770077157211888"  style="position: relative; width: 800px; height: 600px;">
+        <p id="3dmolwarning_17770077157211888" style="background-color:#ffcccc;color:black">3Dmol.js failed to load for some reason.  Please check your browser console for error messages.<br></p>
         </div>
 <script>
 
@@ -45,18 +45,18 @@ $3Dmolpromise = null;
   $3Dmolpromise = loadScriptAsync('https://cdn.jsdelivr.net/npm/3dmol@2.5.4/build/3Dmol-min.js');
 }
 
-var viewer_17765023470719728 = null;
-var warn = document.getElementById("3dmolwarning_17765023470719728");
+var viewer_17770077157211888 = null;
+var warn = document.getElementById("3dmolwarning_17770077157211888");
 if(warn) {
     warn.parentNode.removeChild(warn);
 }
 $3Dmolpromise.then(function() {
-viewer_17765023470719728 = $3Dmol.createViewer(document.getElementById("3dmolviewer_17765023470719728"),{backgroundColor:"white"});
-viewer_17765023470719728.zoomTo();
-	viewer_17765023470719728.addModel("14\nmy_CCCC_best_hybrid\nC     -1.642371     0.331699     0.006964\nC     -0.572311    -0.462714    -0.740395\nC      0.693954    -0.753186     0.070821\nC      1.508423     0.482597     0.450345\nH     -1.298506     1.333531     0.273163\nH     -1.935698    -0.175985     0.930609\nH     -2.538919     0.446723    -0.606773\nH     -0.298072     0.071079    -1.657355\nH     -1.002943    -1.415924    -1.062831\nH      0.421621    -1.301913     0.979516\nH      1.329950    -1.427928    -0.510613\nH      2.425783     0.197181     0.970663\nH      0.953512     1.152157     1.110993\nH      1.794816     1.053408    -0.437951","xyz");
-	viewer_17765023470719728.setStyle({"sphere": {"scale": 0.3}, "stick": {"radius": 0.15}});
-	viewer_17765023470719728.zoomTo();
-viewer_17765023470719728.render();
+viewer_17770077157211888 = $3Dmol.createViewer(document.getElementById("3dmolviewer_17770077157211888"),{backgroundColor:"white"});
+viewer_17770077157211888.zoomTo();
+	viewer_17770077157211888.addModel("14\nmy_CCCC_best_hybrid\nC     -1.642371     0.331699     0.006964\nC     -0.572311    -0.462714    -0.740395\nC      0.693954    -0.753186     0.070821\nC      1.508423     0.482597     0.450345\nH     -1.298506     1.333531     0.273163\nH     -1.935698    -0.175985     0.930609\nH     -2.538919     0.446723    -0.606773\nH     -0.298072     0.071079    -1.657355\nH     -1.002943    -1.415924    -1.062831\nH      0.421621    -1.301913     0.979516\nH      1.329950    -1.427928    -0.510613\nH      2.425783     0.197180     0.970663\nH      0.953512     1.152157     1.110993\nH      1.794816     1.053408    -0.437951","xyz");
+	viewer_17770077157211888.setStyle({"sphere": {"scale": 0.3}, "stick": {"radius": 0.15}});
+	viewer_17770077157211888.zoomTo();
+viewer_17770077157211888.render();
 });
 </script>
             </div>
